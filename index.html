@@ -524,7 +524,7 @@
   <div class="section-header" onclick="toggle('sec-booking')">
     <div class="section-num" style="background:linear-gradient(135deg,#6C5CE7,#a29bfe)">1</div>
     <h2>Do the booking pages look the same?<small>Open 2 links side by side for each customer</small></h2>
-    <span class="section-badge" id="badge-sec-booking">0/4</span>
+    <span class="section-badge" id="badge-sec-booking">0/5</span>
     <span class="section-chevron">&#9662;</span>
   </div>
   <div class="section-body">
@@ -533,6 +533,37 @@
       <br>1. A <strong>custom domain</strong> (their own website address)
       <br>2. A <strong>standard CalendarJet link</strong>
       <br><br>Your job: open both and make sure they match!
+    </div>
+
+    <!-- Client 0: Nafran - our own test account -->
+    <div class="client-card">
+      <div class="client-top">
+        <div class="client-avatar" style="background:linear-gradient(135deg,#00cec9,#81ecec)">N</div>
+        <div class="client-info">
+          <h3>Nafran (Our Test Account)</h3>
+          <div class="client-stat">Custom domain: booking.nafran.com - Use this for booking tests!</div>
+        </div>
+      </div>
+      <div class="link-row">
+        <a class="link-btn link-custom" href="https://booking.nafran.com" target="_blank">Custom Domain</a>
+        <a class="link-btn link-standard" href="https://www.calendarjet.com/nafran" target="_blank">Standard URL</a>
+      </div>
+      <div class="task" data-section="sec-booking">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
+        <div class="task-content">
+          <div class="task-title">Compare Nafran's two pages</div>
+          <ul class="steps">
+            <li class="step"><span class="step-num">1</span><span>Click both links above. They will open in new tabs</span></li>
+            <li class="step"><span class="step-num">2</span><span>Look at tomorrow's date on both pages. Are the same time slots showing?</span></li>
+            <li class="step"><span class="step-num">3</span><span>Do the colors, logo, and text look the same on both?</span></li>
+          </ul>
+          <div class="verdict">
+            <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+            <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+            <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Client 1: Biz Autopilot - 159 bookings -->
@@ -679,12 +710,12 @@
     <div class="task" data-section="sec-testbooking">
       <input type="checkbox" class="task-check" onchange="updateProgress()">
       <div class="task-content">
-        <div class="task-title">Book on a Custom Domain</div>
+        <div class="task-title">Book on a Custom Domain (Nafran)</div>
         <div class="link-row" style="margin-bottom:8px;">
-          <a class="link-btn link-custom" href="https://visitboosterplus.buildmedia.co.in" target="_blank">Open Biz Autopilot's page</a>
+          <a class="link-btn link-custom" href="https://booking.nafran.com" target="_blank">Open booking.nafran.com</a>
         </div>
         <ul class="steps">
-          <li class="step"><span class="step-num">1</span><span>Click the link above to open the booking page</span></li>
+          <li class="step"><span class="step-num">1</span><span>Click the link above to open <strong>Nafran's booking page</strong> on their custom domain</span></li>
           <li class="step"><span class="step-num">2</span><span>Find <strong>tomorrow's date</strong> on the calendar and click it</span></li>
           <li class="step"><span class="step-num">3</span><span>You'll see a list of times (like 10:00 AM, 11:00 AM). Pick any one</span></li>
           <li class="step"><span class="step-num">4</span><span>A form will appear. Type your name as <strong>"QA Test"</strong> and use your email</span></li>
@@ -704,12 +735,12 @@
     <div class="task" data-section="sec-testbooking">
       <input type="checkbox" class="task-check" onchange="updateProgress()">
       <div class="task-content">
-        <div class="task-title">Book on a Standard CalendarJet URL</div>
+        <div class="task-title">Book on the Standard CalendarJet URL (Nafran)</div>
         <div class="link-row" style="margin-bottom:8px;">
-          <a class="link-btn link-standard" href="https://www.calendarjet.com/hamza" target="_blank">Open Hamza's page</a>
+          <a class="link-btn link-standard" href="https://www.calendarjet.com/nafran" target="_blank">Open calendarjet.com/nafran</a>
         </div>
         <ul class="steps">
-          <li class="step"><span class="step-num">1</span><span>Click the link above to open a different customer's booking page</span></li>
+          <li class="step"><span class="step-num">1</span><span>Click the link above to open <strong>Nafran's standard</strong> booking page (same account, different URL)</span></li>
           <li class="step"><span class="step-num">2</span><span>Pick a <strong>different time</strong> than your last booking</span></li>
           <li class="step"><span class="step-num">3</span><span>Fill in the form and submit</span></li>
           <li class="step"><span class="step-num">4</span><span>Check that you see a confirmation page</span></li>
@@ -1238,13 +1269,13 @@
     y += 10;
 
     const sections = [
-      { name: 'Compare Booking Pages', color: [108,92,231], tasks: results.slice(0, 4) },
-      { name: 'Test Booking Submission', color: [0,184,148], tasks: results.slice(4, 6) },
-      { name: 'Timezone Matching', color: [9,132,227], tasks: results.slice(6, 9) },
-      { name: 'Google Calendar Sync', color: [253,203,110], tasks: results.slice(9, 11) },
-      { name: 'AI Agent', color: [225,112,85], tasks: results.slice(11, 12) },
-      { name: 'Branding & Customizer', color: [162,155,254], tasks: results.slice(12, 14) },
-      { name: 'Support Ticket', color: [99,110,114], tasks: results.slice(14, 15) },
+      { name: 'Compare Booking Pages', color: [108,92,231], tasks: results.slice(0, 5) },
+      { name: 'Test Booking Submission', color: [0,184,148], tasks: results.slice(5, 7) },
+      { name: 'Timezone Matching', color: [9,132,227], tasks: results.slice(7, 10) },
+      { name: 'Google Calendar Sync', color: [253,203,110], tasks: results.slice(10, 12) },
+      { name: 'AI Agent', color: [225,112,85], tasks: results.slice(12, 13) },
+      { name: 'Branding & Customizer', color: [162,155,254], tasks: results.slice(13, 15) },
+      { name: 'Support Ticket', color: [99,110,114], tasks: results.slice(15, 16) },
     ];
 
     sections.forEach(sec => {
