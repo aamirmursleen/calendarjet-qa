@@ -1043,19 +1043,20 @@
     <div class="task" data-section="sec-license">
       <input type="checkbox" class="task-check" onchange="updateProgress()">
       <div class="task-content">
-        <div class="task-title">Buy CalendarJet using the test code</div>
+        <div class="task-title">Buy CalendarJet using the test coupon code</div>
         <div class="link-row" style="margin-bottom:8px;">
-          <a class="link-btn link-custom" href="https://pay.calendarjet.com" target="_blank">Open CalendarJet Store</a>
+          <a class="link-btn link-custom" href="https://calendarjet.com" target="_blank">Open calendarjet.com</a>
         </div>
         <ul class="steps">
-          <li class="step"><span class="step-num">1</span><span>Click the link above to open the CalendarJet purchase page</span></li>
-          <li class="step"><span class="step-num">2</span><span>Add CalendarJet to the cart</span></li>
-          <li class="step"><span class="step-num">3</span><span>In the <strong>discount code</strong> box, type: <strong>testing1234</strong> and click Apply</span></li>
-          <li class="step"><span class="step-num">4</span><span>Use your test email (<strong>aamir@nafran.com</strong> or your QA email) for the order</span></li>
-          <li class="step"><span class="step-num">5</span><span>Complete the checkout (the discount should make it free or very cheap)</span></li>
-          <li class="step"><span class="step-num">6</span><span>You should see an order confirmation page from Shopify</span></li>
+          <li class="step"><span class="step-num">1</span><span>Click the link above to open the CalendarJet website</span></li>
+          <li class="step"><span class="step-num">2</span><span>Find and click the <strong>"Instant Access"</strong> button on the homepage</span></li>
+          <li class="step"><span class="step-num">3</span><span>It will take you to the Shopify checkout page</span></li>
+          <li class="step"><span class="step-num">4</span><span>In the <strong>discount code</strong> box, type: <strong>testing1234</strong> and click Apply</span></li>
+          <li class="step"><span class="step-num">5</span><span>Use your test email for the order</span></li>
+          <li class="step"><span class="step-num">6</span><span>Complete the checkout (the coupon should make it free or very cheap)</span></li>
+          <li class="step"><span class="step-num">7</span><span>You should see an order confirmation page</span></li>
         </ul>
-        <div class="tip"><span class="tip-icon">&#128161;</span> The discount code <strong>testing1234</strong> is only for QA testing. Ask the team if it doesn't work.</div>
+        <div class="tip"><span class="tip-icon">&#128161;</span> The coupon code <strong>testing1234</strong> is only for QA testing. Ask the team if it doesn't work.</div>
         <div class="verdict">
           <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
           <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
@@ -1067,15 +1068,22 @@
     <div class="task" data-section="sec-license">
       <input type="checkbox" class="task-check" onchange="updateProgress()">
       <div class="task-content">
-        <div class="task-title">Check if the license key email arrived</div>
+        <div class="task-title">Check the license key email and try activating it</div>
+        <div class="link-row" style="margin-bottom:8px;">
+          <a class="link-btn link-dashboard" href="https://www.calendarjet.com/dashboard" target="_blank">Open Dashboard</a>
+        </div>
         <ul class="steps">
           <li class="step"><span class="step-num">1</span><span>Open your email inbox (the one you used for the purchase)</span></li>
-          <li class="step"><span class="step-num">2</span><span>Check <strong>all tabs</strong>: Inbox, Updates, Promotions, and Spam</span></li>
+          <li class="step"><span class="step-num">2</span><span>Check <strong>ALL tabs</strong>: Inbox, Updates, Promotions, and Spam</span></li>
           <li class="step"><span class="step-num">3</span><span>Look for an email with subject like <strong>"You're In. Here's Your License Key"</strong> or <strong>"Your Calendar Jet Pro License Key is Ready!"</strong></span></li>
           <li class="step"><span class="step-num">4</span><span>Open the email. You should see a license key that looks like: <strong>CJ-XXXX-XXXX-XXXX</strong></span></li>
           <li class="step"><span class="step-num">5</span><span>Write down <strong>which tab</strong> the email appeared in (Inbox? Updates? Promotions? Spam?)</span></li>
+          <li class="step"><span class="step-num">6</span><span>Now go to the CalendarJet <strong>Dashboard</strong> and log in</span></li>
+          <li class="step"><span class="step-num">7</span><span>Click <strong>"Billing & Plan"</strong> in the sidebar</span></li>
+          <li class="step"><span class="step-num">8</span><span>Find the <strong>"Have a license key?"</strong> section and paste your key</span></li>
+          <li class="step"><span class="step-num">9</span><span>Click <strong>"Activate"</strong> — your account should become Pro instantly!</span></li>
         </ul>
-        <div class="tip"><span class="tip-icon">&#128161;</span> It may take up to 5 minutes. If no email after 5 minutes, check Spam. If still nothing, mark as Fail.</div>
+        <div class="tip"><span class="tip-icon">&#128161;</span> The email may take up to 5 minutes. If no email after 5 minutes, check Spam. If the key doesn't activate, mark as Fail.</div>
         <div class="verdict">
           <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
           <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
