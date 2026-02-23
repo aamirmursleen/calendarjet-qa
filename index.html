@@ -242,6 +242,10 @@
       margin-top: 12px;
     }
     .copy-btn:hover { opacity: 0.9; }
+    .pdf-btn {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      margin-top: 8px;
+    }
     .reset-btn {
       display: block;
       width: 100%;
@@ -649,6 +653,7 @@
   <h2>Today's QA Summary</h2>
   <div id="resultsList"></div>
   <button class="copy-btn" onclick="copyResults()">Copy Summary to Clipboard</button>
+  <button class="copy-btn pdf-btn" onclick="downloadPDF()">Download PDF Report</button>
 </div>
 
 <button class="reset-btn" onclick="resetAll()">Reset All Checkboxes</button>
@@ -804,8 +809,134 @@
     updateProgress();
   }
 
+  function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const dateStr = now.toLocaleDateString('en-US', options);
+    const all = document.querySelectorAll('.task input[type="checkbox"]');
+    const checked = document.querySelectorAll('.task input[type="checkbox"]:checked');
+    const passes = document.querySelectorAll('.btn-pass.active').length;
+    const fails = document.querySelectorAll('.btn-fail.active').length;
+    const skips = document.querySelectorAll('.btn-skip.active').length;
+
+    // Header
+    doc.setFillColor(102, 126, 234);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('CalendarJet QA Report', 105, 18, { align: 'center' });
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(dateStr, 105, 30, { align: 'center' });
+
+    // Summary box
+    let y = 50;
+    doc.setTextColor(50, 50, 50);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Summary', 14, y);
+    y += 8;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Tested: ${checked.length} / ${all.length}`, 14, y);
+    y += 6;
+
+    doc.setTextColor(40, 167, 69);
+    doc.text(`Passed: ${passes}`, 14, y);
+    doc.setTextColor(220, 53, 69);
+    doc.text(`Failed: ${fails}`, 60, y);
+    doc.setTextColor(108, 117, 125);
+    doc.text(`Skipped: ${skips}`, 106, y);
+    y += 10;
+
+    // Divider
+    doc.setDrawColor(200, 200, 200);
+    doc.line(14, y, 196, y);
+    y += 8;
+
+    // Section results
+    const sectionNames = {
+      'sec-booking': 'Compare Booking Pages',
+      'sec-testbooking': 'Test Booking Submission',
+      'sec-timezone': 'Timezone Matching',
+      'sec-gcal': 'Google Calendar Sync',
+      'sec-ai': 'AI Agent',
+      'sec-brand': 'Branding & Customizer',
+      'sec-support': 'Support Ticket'
+    };
+    const sectionIds = Object.keys(sectionNames);
+
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(50, 50, 50);
+    doc.text('Detailed Results', 14, y);
+    y += 8;
+
+    sectionIds.forEach(secId => {
+      const tasks = document.querySelectorAll(`#${secId} .task`);
+      if (tasks.length === 0) return;
+
+      // Check if we need a new page
+      if (y > 260) { doc.addPage(); y = 20; }
+
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(102, 126, 234);
+      doc.text(sectionNames[secId], 14, y);
+      y += 6;
+
+      tasks.forEach(task => {
+        if (y > 275) { doc.addPage(); y = 20; }
+
+        const title = task.querySelector('.task-title')?.textContent || '';
+        const pf = task.querySelector('.pass-fail');
+        let status = 'NOT TESTED';
+        let color = [150, 150, 150];
+        if (pf) {
+          if (pf.querySelector('.btn-pass.active')) { status = 'PASS'; color = [40, 167, 69]; }
+          else if (pf.querySelector('.btn-fail.active')) { status = 'FAIL'; color = [220, 53, 69]; }
+          else if (pf.querySelector('.btn-skip.active')) { status = 'SKIP'; color = [108, 117, 125]; }
+        }
+
+        // Status badge
+        doc.setFillColor(...color);
+        doc.roundedRect(14, y - 4, 18, 6, 1, 1, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'bold');
+        doc.text(status, 23, y, { align: 'center' });
+
+        // Task title
+        doc.setTextColor(50, 50, 50);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(title, 36, y);
+        y += 7;
+      });
+      y += 3;
+    });
+
+    // Footer
+    if (y > 270) { doc.addPage(); y = 20; }
+    y += 5;
+    doc.setDrawColor(200, 200, 200);
+    doc.line(14, y, 196, y);
+    y += 8;
+    doc.setFontSize(9);
+    doc.setTextColor(150, 150, 150);
+    doc.text('Generated from CalendarJet QA Checklist', 105, y, { align: 'center' });
+    y += 5;
+    doc.text(`Tester: Samreen | ${dateStr}`, 105, y, { align: 'center' });
+
+    // Download
+    const fileName = `CalendarJet-QA-${now.toISOString().slice(0,10)}.pdf`;
+    doc.save(fileName);
+  }
+
   // Init
   loadState();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 </body>
 </html>
