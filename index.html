@@ -721,9 +721,10 @@
           <li class="step"><span class="step-num">4</span><span>A form will appear. Type your name as <strong>"QA Test"</strong> and use your email</span></li>
           <li class="step"><span class="step-num">5</span><span>Click the <strong>Submit</strong> or <strong>Book</strong> button</span></li>
           <li class="step"><span class="step-num">6</span><span>You should see a page that says <strong>"Booking Confirmed"</strong> or something similar</span></li>
-          <li class="step"><span class="step-num">7</span><span>Now go check your email. Look in the "Updates" tab (not Spam). You should get an email about your booking</span></li>
+          <li class="step"><span class="step-num">7</span><span>Now go check your email. Check <strong>ALL tabs</strong>: Inbox, Updates, Promotions, and Spam</span></li>
+          <li class="step"><span class="step-num">8</span><span>You should get a booking confirmation email. Write down <strong>which tab</strong> it appeared in (Inbox? Updates? Promotions? Spam?)</span></li>
         </ul>
-        <div class="tip"><span class="tip-icon">&#128161;</span> If you don't see a confirmation page or don't get an email within 5 minutes, mark this as Fail!</div>
+        <div class="tip"><span class="tip-icon">&#128161;</span> We need to know which email tab the confirmation lands in! If it's in Spam or Promotions, that's a problem we need to fix. If no email after 5 minutes, mark as Fail.</div>
         <div class="verdict">
           <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
           <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
@@ -744,7 +745,7 @@
           <li class="step"><span class="step-num">2</span><span>Pick a <strong>different time</strong> than your last booking</span></li>
           <li class="step"><span class="step-num">3</span><span>Fill in the form and submit</span></li>
           <li class="step"><span class="step-num">4</span><span>Check that you see a confirmation page</span></li>
-          <li class="step"><span class="step-num">5</span><span>Check your email for the confirmation</span></li>
+          <li class="step"><span class="step-num">5</span><span>Check your email — look in <strong>ALL tabs</strong> (Inbox, Updates, Promotions, Spam). Note which tab it landed in!</span></li>
         </ul>
         <div class="verdict">
           <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
@@ -1025,6 +1026,67 @@
 </div>
 
 <!-- ============================== -->
+<!-- SECTION 8: LICENSE KEY PURCHASE -->
+<!-- ============================== -->
+<div class="section" id="sec-license">
+  <div class="section-header" onclick="toggle('sec-license')">
+    <div class="section-num" style="background:linear-gradient(135deg,#00b894,#fdcb6e)">8</div>
+    <h2>Does buying CalendarJet send a license key?<small>Buy with code "testing1234" and check your email</small></h2>
+    <span class="section-badge" id="badge-sec-license">0/2</span>
+    <span class="section-chevron">&#9662;</span>
+  </div>
+  <div class="section-body">
+    <div class="intro-text">
+      When someone buys CalendarJet, they should get an email with a <strong>license key</strong> (it looks like <strong>CJ-XXXX-XXXX-XXXX</strong>). Let's test if that works!
+    </div>
+
+    <div class="task" data-section="sec-license">
+      <input type="checkbox" class="task-check" onchange="updateProgress()">
+      <div class="task-content">
+        <div class="task-title">Buy CalendarJet using the test code</div>
+        <div class="link-row" style="margin-bottom:8px;">
+          <a class="link-btn link-custom" href="https://pay.calendarjet.com" target="_blank">Open CalendarJet Store</a>
+        </div>
+        <ul class="steps">
+          <li class="step"><span class="step-num">1</span><span>Click the link above to open the CalendarJet purchase page</span></li>
+          <li class="step"><span class="step-num">2</span><span>Add CalendarJet to the cart</span></li>
+          <li class="step"><span class="step-num">3</span><span>In the <strong>discount code</strong> box, type: <strong>testing1234</strong> and click Apply</span></li>
+          <li class="step"><span class="step-num">4</span><span>Use your test email (<strong>aamir@nafran.com</strong> or your QA email) for the order</span></li>
+          <li class="step"><span class="step-num">5</span><span>Complete the checkout (the discount should make it free or very cheap)</span></li>
+          <li class="step"><span class="step-num">6</span><span>You should see an order confirmation page from Shopify</span></li>
+        </ul>
+        <div class="tip"><span class="tip-icon">&#128161;</span> The discount code <strong>testing1234</strong> is only for QA testing. Ask the team if it doesn't work.</div>
+        <div class="verdict">
+          <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+          <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+          <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="task" data-section="sec-license">
+      <input type="checkbox" class="task-check" onchange="updateProgress()">
+      <div class="task-content">
+        <div class="task-title">Check if the license key email arrived</div>
+        <ul class="steps">
+          <li class="step"><span class="step-num">1</span><span>Open your email inbox (the one you used for the purchase)</span></li>
+          <li class="step"><span class="step-num">2</span><span>Check <strong>all tabs</strong>: Inbox, Updates, Promotions, and Spam</span></li>
+          <li class="step"><span class="step-num">3</span><span>Look for an email with subject like <strong>"You're In. Here's Your License Key"</strong> or <strong>"Your Calendar Jet Pro License Key is Ready!"</strong></span></li>
+          <li class="step"><span class="step-num">4</span><span>Open the email. You should see a license key that looks like: <strong>CJ-XXXX-XXXX-XXXX</strong></span></li>
+          <li class="step"><span class="step-num">5</span><span>Write down <strong>which tab</strong> the email appeared in (Inbox? Updates? Promotions? Spam?)</span></li>
+        </ul>
+        <div class="tip"><span class="tip-icon">&#128161;</span> It may take up to 5 minutes. If no email after 5 minutes, check Spam. If still nothing, mark as Fail.</div>
+        <div class="verdict">
+          <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+          <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+          <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== -->
 <!-- RESULTS -->
 <!-- ============================== -->
 <div class="results-card" id="resultsBox">
@@ -1054,7 +1116,7 @@
   const dateStr = now.toLocaleDateString('en-US', dateOpts);
   document.getElementById('dateBar').textContent = dateStr;
   const storageKey = 'cj-qa-' + now.toISOString().slice(0, 10);
-  const ALL_SECTIONS = ['sec-booking','sec-testbooking','sec-timezone','sec-gcal','sec-ai','sec-brand','sec-support'];
+  const ALL_SECTIONS = ['sec-booking','sec-testbooking','sec-timezone','sec-gcal','sec-ai','sec-brand','sec-support','sec-license'];
 
   function loadState() {
     try {
@@ -1276,6 +1338,7 @@
       { name: 'AI Agent', color: [225,112,85], tasks: results.slice(12, 13) },
       { name: 'Branding & Customizer', color: [162,155,254], tasks: results.slice(13, 15) },
       { name: 'Support Ticket', color: [99,110,114], tasks: results.slice(15, 16) },
+      { name: 'License Key Purchase', color: [0,184,148], tasks: results.slice(16, 18) },
     ];
 
     sections.forEach(sec => {
