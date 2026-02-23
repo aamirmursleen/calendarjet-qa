@@ -5,362 +5,655 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CalendarJet QA Daily Checklist</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary: #6C5CE7;
+      --primary-light: #a29bfe;
+      --success: #00b894;
+      --danger: #e17055;
+      --warning: #fdcb6e;
+      --skip: #b2bec3;
+      --bg: #f8f9fe;
+      --card: #ffffff;
+      --text: #2d3436;
+      --text-light: #636e72;
+      --border: #eef0f8;
+      --shadow: 0 4px 20px rgba(108, 92, 231, 0.08);
+      --radius: 16px;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f0f2f5;
-      color: #1a1a2e;
-      padding: 16px;
-      max-width: 900px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 20px 16px 40px;
+      max-width: 760px;
       margin: 0 auto;
+      -webkit-font-smoothing: antialiased;
     }
-    h1 {
-      font-size: 1.6rem;
+
+    /* ===== HEADER ===== */
+    .hero {
+      background: linear-gradient(135deg, #6C5CE7 0%, #a29bfe 50%, #74b9ff 100%);
+      border-radius: 24px;
+      padding: 32px 24px 28px;
       text-align: center;
-      margin-bottom: 4px;
-      color: #1a1a2e;
-    }
-    .subtitle {
-      text-align: center;
-      color: #666;
-      font-size: 0.95rem;
-      margin-bottom: 20px;
-    }
-    .date-bar {
-      text-align: center;
-      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      font-size: 1rem;
-    }
-    .progress-bar {
-      background: #e0e0e0;
-      border-radius: 20px;
-      height: 28px;
       margin-bottom: 20px;
       position: relative;
       overflow: hidden;
     }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 160px; height: 160px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: -40px;
+      width: 120px; height: 120px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50%;
+    }
+    .hero h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      position: relative;
+    }
+    .hero .tagline {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      font-weight: 500;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .hero .date-pill {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      position: relative;
+    }
+
+    /* ===== PROGRESS ===== */
+    .progress-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .progress-header span { font-weight: 700; font-size: 0.95rem; }
+    .progress-pct {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .progress-track {
+      background: #eef0f8;
+      border-radius: 12px;
+      height: 14px;
+      overflow: hidden;
+    }
     .progress-fill {
-      background: linear-gradient(90deg, #43e97b, #38f9d7);
       height: 100%;
-      border-radius: 20px;
-      transition: width 0.5s ease;
+      border-radius: 12px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       width: 0%;
     }
-    .progress-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-weight: 700;
-      font-size: 0.85rem;
-      color: #333;
+    .stats-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
     }
+    .stat-chip {
+      flex: 1;
+      text-align: center;
+      padding: 8px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .stat-pass { background: #e6f9f0; color: #00856a; }
+    .stat-fail { background: #fde8e4; color: #c44025; }
+    .stat-skip { background: #f0f0f5; color: #636e72; }
+    .stat-num { display: block; font-size: 1.2rem; font-weight: 800; }
+
+    /* ===== SECTION CARD ===== */
     .section {
-      background: white;
-      border-radius: 12px;
-      padding: 16px 20px;
+      background: var(--card);
+      border-radius: var(--radius);
       margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid var(--border);
     }
     .section-header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
+      gap: 12px;
+      padding: 18px 20px;
       cursor: pointer;
       user-select: none;
+      transition: background 0.2s;
     }
-    .section-header h2 {
-      font-size: 1.1rem;
-      color: #333;
-      flex: 1;
-    }
-    .section-icon {
-      font-size: 1.4rem;
-    }
-    .section-badge {
-      background: #eee;
-      color: #555;
-      padding: 2px 10px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-    .section-badge.done {
-      background: #d4edda;
-      color: #155724;
-    }
-    .task {
+    .section-header:hover { background: #fafbff; }
+    .section-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
       display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 10px 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .task:last-child { border-bottom: none; }
-    .task input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      margin-top: 2px;
-      accent-color: #667eea;
-      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: white;
       flex-shrink: 0;
     }
-    .task-content { flex: 1; }
-    .task-title {
-      font-weight: 600;
-      font-size: 0.95rem;
-      margin-bottom: 4px;
+    .section-header h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      flex: 1;
+      line-height: 1.3;
     }
-    .task-desc {
-      font-size: 0.85rem;
-      color: #555;
-      line-height: 1.5;
+    .section-header h2 small {
+      display: block;
+      font-weight: 500;
+      font-size: 0.78rem;
+      color: var(--text-light);
+      margin-top: 2px;
     }
-    .task.checked .task-title {
-      text-decoration: line-through;
-      color: #999;
+    .section-badge {
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: #eef0f8;
+      color: var(--text-light);
+      white-space: nowrap;
     }
-    .task.checked .task-desc {
-      color: #bbb;
+    .section-badge.done {
+      background: #e6f9f0;
+      color: #00856a;
+    }
+    .section-chevron {
+      font-size: 1.2rem;
+      color: #b2bec3;
+      transition: transform 0.3s;
+    }
+    .section.collapsed .section-chevron { transform: rotate(-90deg); }
+    .section.collapsed .section-body { display: none; }
+    .section-body {
+      padding: 0 20px 20px;
+    }
+
+    /* ===== INTRO TEXT ===== */
+    .intro-text {
+      background: linear-gradient(135deg, #f8f9fe, #eef0f8);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 0.88rem;
+      color: var(--text-light);
+      line-height: 1.6;
+      margin-bottom: 16px;
+      border-left: 4px solid var(--primary-light);
+    }
+    .intro-text strong { color: var(--text); }
+
+    /* ===== CLIENT CARD ===== */
+    .client-card {
+      background: #fafbff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .client-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .client-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      color: white;
+    }
+    .client-info h3 { font-size: 0.95rem; font-weight: 700; }
+    .client-info .client-stat {
+      font-size: 0.78rem;
+      color: var(--text-light);
     }
     .link-row {
       display: flex;
       gap: 8px;
-      margin-top: 6px;
       flex-wrap: wrap;
     }
     .link-btn {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      background: #f0f0f5;
-      color: #444;
+      gap: 5px;
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
       text-decoration: none;
-      padding: 5px 12px;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      font-weight: 500;
       transition: all 0.2s;
     }
-    .link-btn:hover {
-      background: #667eea;
-      color: white;
+    .link-btn svg { width: 14px; height: 14px; }
+    .link-custom {
+      background: #fff3e6;
+      color: #e67e22;
     }
-    .link-btn.custom { border-left: 3px solid #e67e22; }
-    .link-btn.standard { border-left: 3px solid #3498db; }
-    .link-btn.dashboard { border-left: 3px solid #9b59b6; }
-    .client-card {
-      background: #fafafa;
+    .link-custom:hover { background: #e67e22; color: white; }
+    .link-standard {
+      background: #e8f4fd;
+      color: #2e86de;
+    }
+    .link-standard:hover { background: #2e86de; color: white; }
+    .link-dashboard {
+      background: #f0e6ff;
+      color: #6C5CE7;
+    }
+    .link-dashboard:hover { background: #6C5CE7; color: white; }
+
+    /* ===== TASK ===== */
+    .task {
+      display: flex;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: flex-start;
+    }
+    .task:last-child { border-bottom: none; }
+    .task-check {
+      width: 24px;
+      height: 24px;
       border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 8px;
-    }
-    .client-name {
-      font-weight: 700;
-      font-size: 0.9rem;
-      margin-bottom: 6px;
-    }
-    .steps {
-      margin-top: 8px;
-      padding-left: 4px;
-    }
-    .steps li {
-      font-size: 0.84rem;
-      color: #555;
-      margin-bottom: 4px;
-      list-style: none;
-      padding-left: 20px;
+      border: 2.5px solid #ddd;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all 0.2s;
       position: relative;
+      appearance: none;
+      -webkit-appearance: none;
+      background: white;
     }
-    .steps li::before {
-      content: attr(data-step);
+    .task-check:checked {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .task-check:checked::after {
+      content: '';
       position: absolute;
-      left: 0;
+      top: 3px; left: 7px;
+      width: 6px; height: 11px;
+      border: solid white;
+      border-width: 0 2.5px 2.5px 0;
+      transform: rotate(45deg);
+    }
+    .task-content { flex: 1; min-width: 0; }
+    .task-title {
       font-weight: 700;
-      color: #667eea;
-      font-size: 0.78rem;
+      font-size: 0.92rem;
+      margin-bottom: 6px;
+      line-height: 1.4;
     }
-    .note {
-      background: #fff3cd;
-      border-left: 4px solid #ffc107;
-      padding: 10px 14px;
-      border-radius: 0 8px 8px 0;
+    .task.checked .task-title {
+      text-decoration: line-through;
+      color: var(--text-light);
+    }
+    .task.checked .task-desc, .task.checked .steps {
+      opacity: 0.5;
+    }
+
+    /* ===== STEPS ===== */
+    .steps {
+      list-style: none;
+      padding: 0;
+    }
+    .step {
+      display: flex;
+      gap: 10px;
+      padding: 6px 0;
       font-size: 0.85rem;
-      margin-top: 10px;
+      color: #555;
+      line-height: 1.5;
     }
-    .pass-fail {
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #eef0f8;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.72rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ===== TIP BOX ===== */
+    .tip {
+      background: #fff8e6;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      color: #856404;
+      margin-top: 10px;
       display: flex;
       gap: 8px;
-      margin-top: 8px;
+      align-items: flex-start;
     }
-    .pass-fail button {
-      padding: 4px 14px;
-      border-radius: 6px;
-      border: none;
-      font-weight: 600;
+    .tip-icon { font-size: 1rem; flex-shrink: 0; }
+
+    /* ===== PASS/FAIL BUTTONS ===== */
+    .verdict {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .verdict button {
+      flex: 1;
+      padding: 8px 0;
+      border-radius: 10px;
+      border: 2px solid transparent;
+      font-weight: 700;
       font-size: 0.82rem;
       cursor: pointer;
       transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
     }
-    .btn-pass { background: #d4edda; color: #155724; }
-    .btn-pass:hover, .btn-pass.active { background: #28a745; color: white; }
-    .btn-fail { background: #f8d7da; color: #721c24; }
-    .btn-fail:hover, .btn-fail.active { background: #dc3545; color: white; }
-    .btn-skip { background: #e2e3e5; color: #383d41; }
-    .btn-skip:hover, .btn-skip.active { background: #6c757d; color: white; }
-    .results-box {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
+    .v-pass { background: #e6f9f0; color: #00856a; border-color: #c3efe0; }
+    .v-pass:hover, .v-pass.active { background: var(--success); color: white; border-color: var(--success); }
+    .v-fail { background: #fde8e4; color: #c44025; border-color: #f8d2ca; }
+    .v-fail:hover, .v-fail.active { background: var(--danger); color: white; border-color: var(--danger); }
+    .v-skip { background: #f0f0f5; color: #636e72; border-color: #e0e0e8; }
+    .v-skip:hover, .v-skip.active { background: var(--skip); color: white; border-color: var(--skip); }
+
+    /* ===== RESULTS BOX ===== */
+    .results-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 24px;
       margin-top: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      box-shadow: var(--shadow);
       display: none;
+      border: 1px solid var(--border);
     }
-    .results-box h2 { margin-bottom: 12px; }
-    .result-line {
-      padding: 6px 0;
-      font-size: 0.9rem;
-      border-bottom: 1px solid #f0f0f0;
+    .results-card h2 { font-size: 1.1rem; margin-bottom: 16px; }
+    .result-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
     }
-    .copy-btn {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
+    .result-row:last-child { border-bottom: none; }
+    .result-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .result-title { flex: 1; }
+    .result-status {
+      font-weight: 700;
+      font-size: 0.78rem;
+      padding: 3px 10px;
+      border-radius: 6px;
+    }
+    .rs-pass { background: #e6f9f0; color: #00856a; }
+    .rs-fail { background: #fde8e4; color: #c44025; }
+    .rs-skip { background: #f0f0f5; color: #636e72; }
+    .rs-none { background: #f0f0f5; color: #aaa; }
+
+    /* ===== BUTTONS ===== */
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .btn-group .btn { flex: 1; }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 20px;
+      border-radius: 14px;
       border: none;
-      border-radius: 10px;
-      font-size: 1rem;
+      font-family: inherit;
+      font-size: 0.92rem;
       font-weight: 700;
       cursor: pointer;
-      margin-top: 12px;
+      transition: all 0.2s;
     }
-    .copy-btn:hover { opacity: 0.9; }
-    .pdf-btn {
-      background: linear-gradient(135deg, #e74c3c, #c0392b);
-      margin-top: 8px;
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-copy {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
     }
-    .reset-btn {
-      display: block;
+    .btn-pdf {
+      background: linear-gradient(135deg, #e17055, #fab1a0);
+      color: white;
+    }
+    .btn-reset {
+      background: #f0f0f5;
+      color: var(--text-light);
+      margin-top: 20px;
       width: 100%;
-      padding: 10px;
-      background: #f8d7da;
-      color: #721c24;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 24px;
+      font-size: 0.85rem;
+      padding: 12px;
     }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 0.78rem;
+      color: #b2bec3;
+    }
+
+    /* ===== MOBILE ===== */
     @media (max-width: 600px) {
-      body { padding: 10px; }
-      h1 { font-size: 1.3rem; }
-      .section { padding: 12px 14px; }
+      body { padding: 12px 10px 30px; }
+      .hero { padding: 24px 16px 22px; border-radius: 18px; }
+      .hero h1 { font-size: 1.4rem; }
+      .section-header { padding: 14px 14px; }
+      .section-body { padding: 0 14px 14px; }
+      .btn-group { flex-direction: column; }
+      .stats-row { flex-direction: row; }
     }
   </style>
 </head>
 <body>
 
-<h1>CalendarJet QA Checklist</h1>
-<p class="subtitle">Daily testing guide for Samreen</p>
-<div class="date-bar" id="dateBar"></div>
-
-<div class="progress-bar">
-  <div class="progress-fill" id="progressFill"></div>
-  <div class="progress-text" id="progressText">0 / 0 done</div>
+<!-- HERO -->
+<div class="hero">
+  <h1>CalendarJet QA Checklist</h1>
+  <p class="tagline">Hi Samreen! Here are your daily tests</p>
+  <div class="date-pill" id="dateBar"></div>
 </div>
 
-<!-- SECTION 1: Booking Pages Comparison -->
+<!-- PROGRESS -->
+<div class="progress-card">
+  <div class="progress-header">
+    <span>Your progress today</span>
+    <span class="progress-pct" id="progressPct">0%</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-chip stat-pass"><span class="stat-num" id="statPass">0</span>Passed</div>
+    <div class="stat-chip stat-fail"><span class="stat-num" id="statFail">0</span>Failed</div>
+    <div class="stat-chip stat-skip"><span class="stat-num" id="statSkip">0</span>Skipped</div>
+  </div>
+</div>
+
+<!-- ============================== -->
+<!-- SECTION 1: COMPARE BOOKING PAGES -->
+<!-- ============================== -->
 <div class="section" id="sec-booking">
-  <div class="section-header" onclick="toggleSection('sec-booking')">
-    <span class="section-icon">1.</span>
-    <h2>Compare Booking Pages (3 Clients)</h2>
-    <span class="section-badge" id="badge-sec-booking">0/3</span>
+  <div class="section-header" onclick="toggle('sec-booking')">
+    <div class="section-num" style="background:linear-gradient(135deg,#6C5CE7,#a29bfe)">1</div>
+    <h2>Do the booking pages look the same?<small>Open 2 links side by side for each customer</small></h2>
+    <span class="section-badge" id="badge-sec-booking">0/4</span>
+    <span class="section-chevron">&#9662;</span>
   </div>
   <div class="section-body">
-    <p style="font-size:0.85rem;color:#666;margin-bottom:12px;">Each client has a custom domain and a standard CalendarJet URL. Both should look and work the same.</p>
+    <div class="intro-text">
+      Each of our top customers has <strong>two booking pages</strong> that should look exactly the same:
+      <br>1. A <strong>custom domain</strong> (their own website address)
+      <br>2. A <strong>standard CalendarJet link</strong>
+      <br><br>Your job: open both and make sure they match!
+    </div>
 
-    <!-- Client 1 -->
+    <!-- Client 1: Biz Autopilot - 159 bookings -->
     <div class="client-card">
-      <div class="client-name">Shaun (Mediamatic)</div>
+      <div class="client-top">
+        <div class="client-avatar" style="background:linear-gradient(135deg,#e17055,#fab1a0)">B</div>
+        <div class="client-info">
+          <h3>Biz Autopilot (VisitBoosterPlus)</h3>
+          <div class="client-stat">159 bookings - Our #1 customer!</div>
+        </div>
+      </div>
       <div class="link-row">
-        <a class="link-btn custom" href="https://booking.mediamatic.mt" target="_blank">Custom Domain</a>
-        <a class="link-btn standard" href="https://www.calendarjet.com/mediamatic" target="_blank">Standard URL</a>
+        <a class="link-btn link-custom" href="https://visitboosterplus.buildmedia.co.in" target="_blank">Custom Domain</a>
+        <a class="link-btn link-standard" href="https://www.calendarjet.com/visitboosterplus" target="_blank">Standard URL</a>
       </div>
       <div class="task" data-section="sec-booking">
-        <input type="checkbox" onchange="updateProgress()">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
         <div class="task-content">
-          <div class="task-title">Compare Shaun's pages</div>
-          <ol class="steps">
-            <li data-step="1.">Open BOTH links above in 2 tabs</li>
-            <li data-step="2.">Click tomorrow's date on both pages</li>
-            <li data-step="3.">Check time slots match on both</li>
-            <li data-step="4.">Check logo and colors look right on custom domain</li>
-          </ol>
-          <div class="pass-fail">
-            <button class="btn-pass" onclick="setResult(this,'pass')">Pass</button>
-            <button class="btn-fail" onclick="setResult(this,'fail')">Fail</button>
-            <button class="btn-skip" onclick="setResult(this,'skip')">Skip</button>
+          <div class="task-title">Compare Biz Autopilot's two pages</div>
+          <ul class="steps">
+            <li class="step"><span class="step-num">1</span><span>Click both links above. They will open in new tabs</span></li>
+            <li class="step"><span class="step-num">2</span><span>Look at tomorrow's date on both pages. Are the same time slots showing?</span></li>
+            <li class="step"><span class="step-num">3</span><span>Do the colors, logo, and text look the same on both?</span></li>
+          </ul>
+          <div class="verdict">
+            <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+            <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+            <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Client 2 -->
+    <!-- Client 2: Dennis Lewis - 15 bookings -->
     <div class="client-card">
-      <div class="client-name">Tony (Port City Pixel)</div>
+      <div class="client-top">
+        <div class="client-avatar" style="background:linear-gradient(135deg,#0984e3,#74b9ff)">D</div>
+        <div class="client-info">
+          <h3>Dennis Lewis</h3>
+          <div class="client-stat">15 bookings - Custom domain: dennis.ratio.dev</div>
+        </div>
+      </div>
       <div class="link-row">
-        <a class="link-btn custom" href="https://booking.portcitypixel.com" target="_blank">Custom Domain</a>
-        <a class="link-btn standard" href="https://www.calendarjet.com/tonyshaw" target="_blank">Standard URL</a>
+        <a class="link-btn link-custom" href="https://dennis.ratio.dev" target="_blank">Custom Domain</a>
+        <a class="link-btn link-standard" href="https://www.calendarjet.com/dennislewis" target="_blank">Standard URL</a>
       </div>
       <div class="task" data-section="sec-booking">
-        <input type="checkbox" onchange="updateProgress()">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
         <div class="task-content">
-          <div class="task-title">Compare Tony's pages</div>
-          <ol class="steps">
-            <li data-step="1.">Open BOTH links above in 2 tabs</li>
-            <li data-step="2.">Click tomorrow's date on both pages</li>
-            <li data-step="3.">Check time slots match on both</li>
-            <li data-step="4.">Check logo and colors look right on custom domain</li>
-          </ol>
-          <div class="pass-fail">
-            <button class="btn-pass" onclick="setResult(this,'pass')">Pass</button>
-            <button class="btn-fail" onclick="setResult(this,'fail')">Fail</button>
-            <button class="btn-skip" onclick="setResult(this,'skip')">Skip</button>
+          <div class="task-title">Compare Dennis's two pages</div>
+          <ul class="steps">
+            <li class="step"><span class="step-num">1</span><span>Click both links above. They will open in new tabs</span></li>
+            <li class="step"><span class="step-num">2</span><span>Look at tomorrow's date on both pages. Are the same time slots showing?</span></li>
+            <li class="step"><span class="step-num">3</span><span>Do the colors, logo, and text look the same on both?</span></li>
+          </ul>
+          <div class="verdict">
+            <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+            <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+            <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Client 3 -->
+    <!-- Client 3: Hamza - 14 bookings -->
     <div class="client-card">
-      <div class="client-name">Hamza (Zblogging)</div>
+      <div class="client-top">
+        <div class="client-avatar" style="background:linear-gradient(135deg,#00b894,#55efc4)">H</div>
+        <div class="client-info">
+          <h3>Hamza Hashim (Zblogging)</h3>
+          <div class="client-stat">14 bookings - Custom domain: book.zblogging.com</div>
+        </div>
+      </div>
       <div class="link-row">
-        <a class="link-btn custom" href="https://book.zblogging.com" target="_blank">Custom Domain</a>
-        <a class="link-btn standard" href="https://www.calendarjet.com/hamza" target="_blank">Standard URL</a>
+        <a class="link-btn link-custom" href="https://book.zblogging.com" target="_blank">Custom Domain</a>
+        <a class="link-btn link-standard" href="https://www.calendarjet.com/hamza" target="_blank">Standard URL</a>
       </div>
       <div class="task" data-section="sec-booking">
-        <input type="checkbox" onchange="updateProgress()">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
         <div class="task-content">
-          <div class="task-title">Compare Hamza's pages</div>
-          <ol class="steps">
-            <li data-step="1.">Open BOTH links above in 2 tabs</li>
-            <li data-step="2.">Click tomorrow's date on both pages</li>
-            <li data-step="3.">Check time slots match on both</li>
-            <li data-step="4.">Check logo and colors look right on custom domain</li>
-          </ol>
-          <div class="pass-fail">
-            <button class="btn-pass" onclick="setResult(this,'pass')">Pass</button>
-            <button class="btn-fail" onclick="setResult(this,'fail')">Fail</button>
-            <button class="btn-skip" onclick="setResult(this,'skip')">Skip</button>
+          <div class="task-title">Compare Hamza's two pages</div>
+          <ul class="steps">
+            <li class="step"><span class="step-num">1</span><span>Click both links above. They will open in new tabs</span></li>
+            <li class="step"><span class="step-num">2</span><span>Look at tomorrow's date on both pages. Are the same time slots showing?</span></li>
+            <li class="step"><span class="step-num">3</span><span>Do the colors, logo, and text look the same on both?</span></li>
+          </ul>
+          <div class="verdict">
+            <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+            <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+            <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Client 4: Jamie Coones - 13 bookings -->
+    <div class="client-card">
+      <div class="client-top">
+        <div class="client-avatar" style="background:linear-gradient(135deg,#fdcb6e,#f39c12)">J</div>
+        <div class="client-info">
+          <h3>Jamie Coones</h3>
+          <div class="client-stat">13 bookings - Custom domain: jc.poosquad.com</div>
+        </div>
+      </div>
+      <div class="link-row">
+        <a class="link-btn link-custom" href="https://jc.poosquad.com" target="_blank">Custom Domain</a>
+        <a class="link-btn link-standard" href="https://www.calendarjet.com/chiefscooper" target="_blank">Standard URL</a>
+      </div>
+      <div class="task" data-section="sec-booking">
+        <input type="checkbox" class="task-check" onchange="updateProgress()">
+        <div class="task-content">
+          <div class="task-title">Compare Jamie's two pages</div>
+          <ul class="steps">
+            <li class="step"><span class="step-num">1</span><span>Click both links above. They will open in new tabs</span></li>
+            <li class="step"><span class="step-num">2</span><span>Look at tomorrow's date on both pages. Are the same time slots showing?</span></li>
+            <li class="step"><span class="step-num">3</span><span>Do the colors, logo, and text look the same on both?</span></li>
+          </ul>
+          <div class="verdict">
+            <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+            <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+            <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
           </div>
         </div>
       </div>
@@ -368,322 +661,381 @@
   </div>
 </div>
 
-<!-- SECTION 2: Test a Booking -->
+<!-- ============================== -->
+<!-- SECTION 2: MAKE A TEST BOOKING -->
+<!-- ============================== -->
 <div class="section" id="sec-testbooking">
-  <div class="section-header" onclick="toggleSection('sec-testbooking')">
-    <span class="section-icon">2.</span>
-    <h2>Test a Booking Submission</h2>
+  <div class="section-header" onclick="toggle('sec-testbooking')">
+    <div class="section-num" style="background:linear-gradient(135deg,#00b894,#55efc4)">2</div>
+    <h2>Can someone book an appointment?<small>Try booking on both a custom domain and standard URL</small></h2>
     <span class="section-badge" id="badge-sec-testbooking">0/2</span>
+    <span class="section-chevron">&#9662;</span>
   </div>
   <div class="section-body">
-    <p style="font-size:0.85rem;color:#666;margin-bottom:12px;">Pick any ONE client from above. Use their custom domain link.</p>
+    <div class="intro-text">
+      This is like pretending to be a customer! You'll book an appointment to make sure the whole process works from start to finish.
+    </div>
 
     <div class="task" data-section="sec-testbooking">
-      <input type="checkbox" onchange="updateProgress()">
+      <input type="checkbox" class="task-check" onchange="updateProgress()">
       <div class="task-content">
-        <div class="task-title">Book on Custom Domain</div>
-        <ol class="steps">
-          <li data-step="1.">Go to any client's custom domain booking page</li>
-          <li data-step="2.">Click tomorrow's date</li>
-          <li data-step="3.">Pick any available time slot</li>
-          <li data-step="4.">Fill in the form: Name = "QA Test", Email = your email</li>
-          <li data-step="5.">Click Submit / Book</li>
-          <li data-step="6.">You should see a confirmation page saying "Booking confirmed"</li>
-          <li data-step="7.">Check your email inbox (look in "Updates" tab, not spam) for confirmation email</li>
-          <li data-step="8.">Open the email - check the date and time are correct</li>
-        </ol>
-        <div class="pass-fail">
-          <button class="btn-pass" onclick="setResult(this,'pass')">Pass</button>
-          <button class="btn-fail" onclick="setResult(this,'fail')">Fail</button>
-          <button class="btn-skip" onclick="setResult(this,'skip')">Skip</button>
+        <div class="task-title">Book on a Custom Domain</div>
+        <div class="link-row" style="margin-bottom:8px;">
+          <a class="link-btn link-custom" href="https://visitboosterplus.buildmedia.co.in" target="_blank">Open Biz Autopilot's page</a>
+        </div>
+        <ul class="steps">
+          <li class="step"><span class="step-num">1</span><span>Click the link above to open the booking page</span></li>
+          <li class="step"><span class="step-num">2</span><span>Find <strong>tomorrow's date</strong> on the calendar and click it</span></li>
+          <li class="step"><span class="step-num">3</span><span>You'll see a list of times (like 10:00 AM, 11:00 AM). Pick any one</span></li>
+          <li class="step"><span class="step-num">4</span><span>A form will appear. Type your name as <strong>"QA Test"</strong> and use your email</span></li>
+          <li class="step"><span class="step-num">5</span><span>Click the <strong>Submit</strong> or <strong>Book</strong> button</span></li>
+          <li class="step"><span class="step-num">6</span><span>You should see a page that says <strong>"Booking Confirmed"</strong> or something similar</span></li>
+          <li class="step"><span class="step-num">7</span><span>Now go check your email. Look in the "Updates" tab (not Spam). You should get an email about your booking</span></li>
+        </ul>
+        <div class="tip"><span class="tip-icon">&#128161;</span> If you don't see a confirmation page or don't get an email within 5 minutes, mark this as Fail!</div>
+        <div class="verdict">
+          <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+          <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+          <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
         </div>
       </div>
     </div>
 
     <div class="task" data-section="sec-testbooking">
-      <input type="checkbox" onchange="updateProgress()">
+      <input type="checkbox" class="task-check" onchange="updateProgress()">
       <div class="task-content">
-        <div class="task-title">Book on Standard URL</div>
-        <ol class="steps">
-          <li data-step="1.">Go to the same client's standard CalendarJet URL</li>
-          <li data-step="2.">Pick a DIFFERENT time than your first booking</li>
-          <li data-step="3.">Fill in form and submit</li>
-          <li data-step="4.">Confirm you see the confirmation page</li>
-          <li data-step="5.">Check you get a confirmation email</li>
-        </ol>
-        <div class="pass-fail">
-          <button class="btn-pass" onclick="setResult(this,'pass')">Pass</button>
-          <button class="btn-fail" onclick="setResult(this,'fail')">Fail</button>
-          <button class="btn-skip" onclick="setResult(this,'skip')">Skip</button>
+        <div class="task-title">Book on a Standard CalendarJet URL</div>
+        <div class="link-row" style="margin-bottom:8px;">
+          <a class="link-btn link-standard" href="https://www.calendarjet.com/hamza" target="_blank">Open Hamza's page</a>
+        </div>
+        <ul class="steps">
+          <li class="step"><span class="step-num">1</span><span>Click the link above to open a different customer's booking page</span></li>
+          <li class="step"><span class="step-num">2</span><span>Pick a <strong>different time</strong> than your last booking</span></li>
+          <li class="step"><span class="step-num">3</span><span>Fill in the form and submit</span></li>
+          <li class="step"><span class="step-num">4</span><span>Check that you see a confirmation page</span></li>
+          <li class="step"><span class="step-num">5</span><span>Check your email for the confirmation</span></li>
+        </ul>
+        <div class="verdict">
+          <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+          <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+          <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SECTION 3: Timezone Matching -->
+<!-- ============================== -->
+<!-- SECTION 3: TIMEZONE CHECK -->
+<!-- ============================== -->
 <div class="section" id="sec-timezone">
-  <div class="section-header" onclick="toggleSection('sec-timezone')">
-    <span class="section-icon">3.</span>
-    <h2>Timezone Matching</h2>
+  <div class="section-header" onclick="toggle('sec-timezone')">
+    <div class="section-num" style="background:linear-gradient(135deg,#0984e3,#74b9ff)">3</div>
+    <h2>Does the time match everywhere?<small>Booking page, email, and dashboard should all agree</small></h2>
     <span class="section-badge" id="badge-sec-timezone">0/3</span>
+    <span class="section-chevron">&#9662;</span>
   </div>
   <div class="section-body">
-    <p style="font-size:0.85rem;color:#666;margin-bottom:12px;">After making a test booking, verify the timezone is consistent everywhere.</p>
+    <div class="intro-text">
+      When you book at "10:00 AM", the email should say "10:00 AM" and the dashboard should say "10:00 AM" too. If the times are different, that's a big bug!
+    </div>
 
     <div class="task" data-section="sec-timezone">
-      <input type="checkbox" onchange="updateProgress()">
+      <input type="checkbox" class="task-check" onchange="updateProgress()">
       <div class="task-content">
-        <div class="task-title">Booking page shows correct timezone</div>
-        <ol class="steps">
-          <li data-step="1.">On the booking page, look for the timezone displayed (usually near the calendar or time slots)</li>
-          <li data-step="2.">It should match your device's timezone OR the host's timezone</li>
-          <li data-step="3.">Note down what timezone you see</li>
-        </ol>
-        <div class="pass-fail">
-          <button class="btn-pass" onclick="setResult(this,'pass')">Pass</button>
-          <button class="btn-fail" onclick="setResult(this,'fail')">Fail</button>
-          <button class="btn-skip" onclick="setResult(this,'skip')">Skip</button>
+        <div class="task-title">Check the time on the booking page</div>
+        <ul class="steps">
+          <li class="step"><span class="step-num">1</span><span>Go back to the booking page you just used</span></li>
+          <li class="step"><span class="step-num">2</span><span>Look near the calendar or time slots - you should see a timezone name (like "Asia/Karachi" or "America/New_York")</span></li>
+          <li class="step"><span class="step-num">3</span><span><strong>Write down</strong> what timezone you see and what time you booked</span></li>
+        </ul>
+        <div class="verdict">
+          <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+          <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+          <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
         </div>
       </div>
     </div>
 
     <div class="task" data-section="sec-timezone">
-      <input type="checkbox" onchange="updateProgress()">
+      <input type="checkbox" class="task-check" onchange="updateProgress()">
       <div class="task-content">
-        <div class="task-title">Confirmation email shows correct time</div>
-        <ol class="steps">
-          <li data-step="1.">Open the confirmation email you received</li>
-          <li data-step="2.">Check the time shown matches the time you selected on the booking page</li>
-          <li data-step="3.">Check the timezone label is correct</li>
-        </ol>
-        <div class="pass-fail">
-          <button class="btn-pass" onclick="setResult(this,'pass')">Pass</button>
-          <button class="btn-fail" onclick="setResult(this,'fail')">Fail</button>
-          <button class="btn-skip" onclick="setResult(this,'skip')">Skip</button>
+        <div class="task-title">Check the time in the confirmation email</div>
+        <ul class="steps">
+          <li class="step"><span class="step-num">1</span><span>Open the confirmation email from your test booking</span></li>
+          <li class="step"><span class="step-num">2</span><span>Look at the date and time shown in the email</span></li>
+          <li class="step"><span class="step-num">3</span><span>Does it match the time you picked on the booking page? If yes = Pass!</span></li>
+        </ul>
+        <div class="tip"><span class="tip-icon">&#128161;</span> The email might show the time in the host's timezone. That's OK as long as it says which timezone.</div>
+        <div class="verdict">
+          <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+          <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+          <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
         </div>
       </div>
     </div>
 
     <div class="task" data-section="sec-timezone">
-      <input type="checkbox" onchange="updateProgress()">
+      <input type="checkbox" class="task-check" onchange="updateProgress()">
       <div class="task-content">
-        <div class="task-title">Dashboard shows correct time</div>
-        <div class="link-row">
-          <a class="link-btn dashboard" href="https://www.calendarjet.com/dashboard" target="_blank">Open Dashboard</a>
+        <div class="task-title">Check the time on the Dashboard</div>
+        <div class="link-row" style="margin-bottom:8px;">
+          <a class="link-btn link-dashboard" href="https://www.calendarjet.com/dashboard" target="_blank">Open Dashboard</a>
         </div>
-        <ol class="steps">
-          <li data-step="1.">Log into the CalendarJet dashboard</li>
-          <li data-step="2.">Find your test booking in the bookings list or calendar view</li>
-          <li data-step="3.">Check the date and time match what you booked</li>
-        </ol>
-        <div class="pass-fail">
-          <button class="btn-pass" onclick="setResult(this,'pass')">Pass</button>
-          <button class="btn-fail" onclick="setResult(this,'fail')">Fail</button>
-          <button class="btn-skip" onclick="setResult(this,'skip')">Skip</button>
+        <ul class="steps">
+          <li class="step"><span class="step-num">1</span><span>Click the link above to open the CalendarJet dashboard</span></li>
+          <li class="step"><span class="step-num">2</span><span>Look for your test booking in the list or calendar view</span></li>
+          <li class="step"><span class="step-num">3</span><span>Does the time and date match what you booked? If yes = Pass!</span></li>
+        </ul>
+        <div class="verdict">
+          <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+          <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+          <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SECTION 4: Google Calendar Sync -->
+<!-- ============================== -->
+<!-- SECTION 4: GOOGLE CALENDAR -->
+<!-- ============================== -->
 <div class="section" id="sec-gcal">
-  <div class="section-header" onclick="toggleSection('sec-gcal')">
-    <span class="section-icon">4.</span>
-    <h2>Google Calendar Sync</h2>
+  <div class="section-header" onclick="toggle('sec-gcal')">
+    <div class="section-num" style="background:linear-gradient(135deg,#fdcb6e,#f39c12)">4</div>
+    <h2>Does Google Calendar work with bookings?<small>Check if bookings show up and block time slots</small></h2>
     <span class="section-badge" id="badge-sec-gcal">0/2</span>
+    <span class="section-chevron">&#9662;</span>
   </div>
   <div class="section-body">
+    <div class="intro-text">
+      CalendarJet talks to Google Calendar. When someone books, it should appear on Google Calendar. And if you add something to Google Calendar, that time should disappear from the booking page.
+    </div>
+
     <div class="task" data-section="sec-gcal">
-      <input type="checkbox" onchange="updateProgress()">
+      <input type="checkbox" class="task-check" onchange="updateProgress()">
       <div class="task-content">
-        <div class="task-title">Booking appears in Google Calendar</div>
-        <ol class="steps">
-          <li data-step="1.">Open Google Calendar (on phone or computer)</li>
-          <li data-step="2.">Go to tomorrow's date</li>
-          <li data-step="3.">You should see the test booking you just made</li>
-          <li data-step="4.">Check the time matches what you booked</li>
-        </ol>
-        <div class="pass-fail">
-          <button class="btn-pass" onclick="setResult(this,'pass')">Pass</button>
-          <button class="btn-fail" onclick="setResult(this,'fail')">Fail</button>
-          <button class="btn-skip" onclick="setResult(this,'skip')">Skip</button>
+        <div class="task-title">Does the test booking appear in Google Calendar?</div>
+        <ul class="steps">
+          <li class="step"><span class="step-num">1</span><span>Open <strong>Google Calendar</strong> on your phone or computer</span></li>
+          <li class="step"><span class="step-num">2</span><span>Go to <strong>tomorrow's date</strong></span></li>
+          <li class="step"><span class="step-num">3</span><span>Look for your test booking - it should show up as an event</span></li>
+          <li class="step"><span class="step-num">4</span><span>Check the time matches what you booked. If it's there = Pass!</span></li>
+        </ul>
+        <div class="verdict">
+          <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+          <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+          <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
         </div>
       </div>
     </div>
 
     <div class="task" data-section="sec-gcal">
-      <input type="checkbox" onchange="updateProgress()">
+      <input type="checkbox" class="task-check" onchange="updateProgress()">
       <div class="task-content">
-        <div class="task-title">Google Calendar blocks availability</div>
-        <ol class="steps">
-          <li data-step="1.">In Google Calendar, create a fake event for tomorrow (e.g. 2:00 PM). Save it</li>
-          <li data-step="2.">Go back to the booking page, refresh the page</li>
-          <li data-step="3.">The 2:00 PM time slot should now be gone / blocked</li>
-          <li data-step="4.">Go back to Google Calendar, delete that fake event</li>
-          <li data-step="5.">Refresh the booking page - the 2:00 PM slot should come back</li>
-        </ol>
-        <div class="note">This test confirms two-way calendar sync is working correctly.</div>
-        <div class="pass-fail">
-          <button class="btn-pass" onclick="setResult(this,'pass')">Pass</button>
-          <button class="btn-fail" onclick="setResult(this,'fail')">Fail</button>
-          <button class="btn-skip" onclick="setResult(this,'skip')">Skip</button>
+        <div class="task-title">Does a Google Calendar event block that time slot?</div>
+        <ul class="steps">
+          <li class="step"><span class="step-num">1</span><span>In Google Calendar, create a <strong>fake event</strong> for tomorrow at 2:00 PM. Save it</span></li>
+          <li class="step"><span class="step-num">2</span><span>Go to the booking page and <strong>refresh</strong> the page (press F5 or pull down on phone)</span></li>
+          <li class="step"><span class="step-num">3</span><span>Click tomorrow's date. The 2:00 PM slot should be <strong>gone</strong> (blocked)</span></li>
+          <li class="step"><span class="step-num">4</span><span>Now go back to Google Calendar and <strong>delete</strong> that fake event</span></li>
+          <li class="step"><span class="step-num">5</span><span>Refresh the booking page again. The 2:00 PM slot should <strong>come back</strong></span></li>
+        </ul>
+        <div class="tip"><span class="tip-icon">&#128161;</span> This test makes sure CalendarJet and Google Calendar are talking to each other. If the time slot doesn't disappear or come back, mark as Fail.</div>
+        <div class="verdict">
+          <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+          <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+          <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SECTION 5: AI Agent -->
+<!-- ============================== -->
+<!-- SECTION 5: AI CHAT AGENT -->
+<!-- ============================== -->
 <div class="section" id="sec-ai">
-  <div class="section-header" onclick="toggleSection('sec-ai')">
-    <span class="section-icon">5.</span>
-    <h2>AI Agent</h2>
+  <div class="section-header" onclick="toggle('sec-ai')">
+    <div class="section-num" style="background:linear-gradient(135deg,#e17055,#fab1a0)">5</div>
+    <h2>Is the AI chat helper working?<small>Ask the chatbot a question on a booking page</small></h2>
     <span class="section-badge" id="badge-sec-ai">0/1</span>
+    <span class="section-chevron">&#9662;</span>
   </div>
   <div class="section-body">
+    <div class="intro-text">
+      Some booking pages have a little <strong>chat bubble</strong> in the bottom-right corner. This is an AI helper that can answer questions about available times.
+    </div>
+
     <div class="task" data-section="sec-ai">
-      <input type="checkbox" onchange="updateProgress()">
+      <input type="checkbox" class="task-check" onchange="updateProgress()">
       <div class="task-content">
-        <div class="task-title">AI Chat responds correctly</div>
-        <ol class="steps">
-          <li data-step="1.">On any booking page, look for a chat bubble icon (bottom-right corner)</li>
-          <li data-step="2.">Click it and type: "What time slots are available tomorrow?"</li>
-          <li data-step="3.">It should give you a real answer with actual times, not an error message</li>
-          <li data-step="4.">Try another question: "Can I book for 30 minutes?"</li>
-          <li data-step="5.">Verify you get a helpful response</li>
-        </ol>
-        <div class="pass-fail">
-          <button class="btn-pass" onclick="setResult(this,'pass')">Pass</button>
-          <button class="btn-fail" onclick="setResult(this,'fail')">Fail</button>
-          <button class="btn-skip" onclick="setResult(this,'skip')">Skip</button>
+        <div class="task-title">Ask the AI chatbot a question</div>
+        <div class="link-row" style="margin-bottom:8px;">
+          <a class="link-btn link-custom" href="https://book.zblogging.com" target="_blank">Open Hamza's booking page</a>
+        </div>
+        <ul class="steps">
+          <li class="step"><span class="step-num">1</span><span>Click the link above to open a booking page</span></li>
+          <li class="step"><span class="step-num">2</span><span>Look in the <strong>bottom-right corner</strong> for a chat bubble icon</span></li>
+          <li class="step"><span class="step-num">3</span><span>Click it! A chat window will open</span></li>
+          <li class="step"><span class="step-num">4</span><span>Type: <strong>"What times are available tomorrow?"</strong></span></li>
+          <li class="step"><span class="step-num">5</span><span>Wait a few seconds. The AI should reply with actual times (not an error)</span></li>
+          <li class="step"><span class="step-num">6</span><span>Try another question: <strong>"Can I book for 30 minutes?"</strong></span></li>
+        </ul>
+        <div class="tip"><span class="tip-icon">&#128161;</span> If there's no chat bubble, or if the AI gives an error message instead of a real answer, mark as Fail.</div>
+        <div class="verdict">
+          <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+          <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+          <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SECTION 6: Branding / Customizer -->
+<!-- ============================== -->
+<!-- SECTION 6: BRANDING & CUSTOMIZER -->
+<!-- ============================== -->
 <div class="section" id="sec-brand">
-  <div class="section-header" onclick="toggleSection('sec-brand')">
-    <span class="section-icon">6.</span>
-    <h2>Branding & Customizer Match</h2>
+  <div class="section-header" onclick="toggle('sec-brand')">
+    <div class="section-num" style="background:linear-gradient(135deg,#a29bfe,#6c5ce7)">6</div>
+    <h2>Does the branding look right?<small>Check if profile and customizer changes show on booking pages</small></h2>
     <span class="section-badge" id="badge-sec-brand">0/2</span>
+    <span class="section-chevron">&#9662;</span>
   </div>
   <div class="section-body">
+    <div class="intro-text">
+      "Branding" means the logo, colors, and text on a booking page. When someone changes their settings in the dashboard, those changes should show up on their booking page too.
+    </div>
+
     <div class="task" data-section="sec-brand">
-      <input type="checkbox" onchange="updateProgress()">
+      <input type="checkbox" class="task-check" onchange="updateProgress()">
       <div class="task-content">
-        <div class="task-title">Profile page changes reflect on booking page</div>
-        <div class="link-row">
-          <a class="link-btn dashboard" href="https://www.calendarjet.com/dashboard" target="_blank">Dashboard</a>
+        <div class="task-title">Does the profile match the booking page?</div>
+        <div class="link-row" style="margin-bottom:8px;">
+          <a class="link-btn link-dashboard" href="https://www.calendarjet.com/dashboard" target="_blank">Open Dashboard</a>
         </div>
-        <ol class="steps">
-          <li data-step="1.">Go to Dashboard > Profile settings</li>
-          <li data-step="2.">Note the name, bio, and profile image</li>
-          <li data-step="3.">Open the booking page for the same user</li>
-          <li data-step="4.">Verify the name, bio, and image match what's in the profile</li>
-        </ol>
-        <div class="pass-fail">
-          <button class="btn-pass" onclick="setResult(this,'pass')">Pass</button>
-          <button class="btn-fail" onclick="setResult(this,'fail')">Fail</button>
-          <button class="btn-skip" onclick="setResult(this,'skip')">Skip</button>
+        <ul class="steps">
+          <li class="step"><span class="step-num">1</span><span>Log into the CalendarJet dashboard using the test account</span></li>
+          <li class="step"><span class="step-num">2</span><span>Go to <strong>Profile</strong> settings. Look at the name, bio, and profile picture</span></li>
+          <li class="step"><span class="step-num">3</span><span>Now open that user's booking page in a new tab</span></li>
+          <li class="step"><span class="step-num">4</span><span>Does the <strong>name, bio, and picture</strong> match what you saw in the dashboard?</span></li>
+        </ul>
+        <div class="verdict">
+          <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+          <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+          <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
         </div>
       </div>
     </div>
 
     <div class="task" data-section="sec-brand">
-      <input type="checkbox" onchange="updateProgress()">
+      <input type="checkbox" class="task-check" onchange="updateProgress()">
       <div class="task-content">
-        <div class="task-title">Booking page customizer changes appear</div>
-        <div class="link-row">
-          <a class="link-btn dashboard" href="https://www.calendarjet.com/branding" target="_blank">Branding Page</a>
+        <div class="task-title">Does the booking page customizer work?</div>
+        <div class="link-row" style="margin-bottom:8px;">
+          <a class="link-btn link-dashboard" href="https://www.calendarjet.com/branding" target="_blank">Open Branding Page</a>
         </div>
-        <ol class="steps">
-          <li data-step="1.">Go to Dashboard > Branding / Booking Page Customizer</li>
-          <li data-step="2.">Note the logo, colors, button styles, and layout settings</li>
-          <li data-step="3.">Open the booking page (both custom domain and standard URL)</li>
-          <li data-step="4.">Verify the logo, colors, and layout match the customizer settings</li>
-        </ol>
-        <div class="pass-fail">
-          <button class="btn-pass" onclick="setResult(this,'pass')">Pass</button>
-          <button class="btn-fail" onclick="setResult(this,'fail')">Fail</button>
-          <button class="btn-skip" onclick="setResult(this,'skip')">Skip</button>
+        <ul class="steps">
+          <li class="step"><span class="step-num">1</span><span>Go to the <strong>Branding / Booking Page Customizer</strong> in the dashboard</span></li>
+          <li class="step"><span class="step-num">2</span><span>Look at the logo, colors, button styles, and layout that are set</span></li>
+          <li class="step"><span class="step-num">3</span><span>Now open the booking page (both custom domain AND standard URL)</span></li>
+          <li class="step"><span class="step-num">4</span><span>Do the <strong>logo, colors, and layout</strong> match what you saw in the customizer?</span></li>
+        </ul>
+        <div class="verdict">
+          <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+          <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+          <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SECTION 7: Support Ticket -->
+<!-- ============================== -->
+<!-- SECTION 7: SUPPORT TICKET -->
+<!-- ============================== -->
 <div class="section" id="sec-support">
-  <div class="section-header" onclick="toggleSection('sec-support')">
-    <span class="section-icon">7.</span>
-    <h2>Support Ticket Submission</h2>
+  <div class="section-header" onclick="toggle('sec-support')">
+    <div class="section-num" style="background:linear-gradient(135deg,#636e72,#b2bec3)">7</div>
+    <h2>Does the support form work?<small>Send a test ticket and see if it goes through</small></h2>
     <span class="section-badge" id="badge-sec-support">0/1</span>
+    <span class="section-chevron">&#9662;</span>
   </div>
   <div class="section-body">
+    <div class="intro-text">
+      Customers use the support form when they have problems. We need to make sure the form actually works and sends the message to our team.
+    </div>
+
     <div class="task" data-section="sec-support">
-      <input type="checkbox" onchange="updateProgress()">
+      <input type="checkbox" class="task-check" onchange="updateProgress()">
       <div class="task-content">
         <div class="task-title">Submit a test support ticket</div>
-        <div class="link-row">
-          <a class="link-btn standard" href="https://www.calendarjet.com/support" target="_blank">Support Page</a>
-          <a class="link-btn standard" href="https://www.calendarjet.com/contact" target="_blank">Contact Page</a>
+        <div class="link-row" style="margin-bottom:8px;">
+          <a class="link-btn link-standard" href="https://www.calendarjet.com/support" target="_blank">Support Page</a>
+          <a class="link-btn link-standard" href="https://www.calendarjet.com/contact" target="_blank">Contact Page</a>
         </div>
-        <ol class="steps">
-          <li data-step="1.">Go to the Support or Contact page</li>
-          <li data-step="2.">Subject: [QA-TEST] Daily check</li>
-          <li data-step="3.">Write any message and submit</li>
-          <li data-step="4.">You should see a success message</li>
-          <li data-step="5.">It should appear in Jira within 1 hour (the team can confirm)</li>
-        </ol>
-        <div class="pass-fail">
-          <button class="btn-pass" onclick="setResult(this,'pass')">Pass</button>
-          <button class="btn-fail" onclick="setResult(this,'fail')">Fail</button>
-          <button class="btn-skip" onclick="setResult(this,'skip')">Skip</button>
+        <ul class="steps">
+          <li class="step"><span class="step-num">1</span><span>Click one of the links above to open the support or contact page</span></li>
+          <li class="step"><span class="step-num">2</span><span>In the <strong>Subject</strong> field, type: <strong>[QA-TEST] Daily check</strong></span></li>
+          <li class="step"><span class="step-num">3</span><span>In the message box, type anything (like "Testing the form today")</span></li>
+          <li class="step"><span class="step-num">4</span><span>Click <strong>Submit</strong></span></li>
+          <li class="step"><span class="step-num">5</span><span>You should see a <strong>success message</strong> (like "Your message has been sent")</span></li>
+        </ul>
+        <div class="tip"><span class="tip-icon">&#128161;</span> The team will check that it shows up in Jira. You just need to make sure the form submits successfully.</div>
+        <div class="verdict">
+          <button class="v-pass" onclick="setVerdict(this,'pass')">Pass</button>
+          <button class="v-fail" onclick="setVerdict(this,'fail')">Fail</button>
+          <button class="v-skip" onclick="setVerdict(this,'skip')">Skip</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Results Summary -->
-<div class="results-box" id="resultsBox">
-  <h2>Today's QA Summary</h2>
+<!-- ============================== -->
+<!-- RESULTS -->
+<!-- ============================== -->
+<div class="results-card" id="resultsBox">
+  <h2>Today's Results</h2>
   <div id="resultsList"></div>
-  <button class="copy-btn" onclick="copyResults()">Copy Summary to Clipboard</button>
-  <button class="copy-btn pdf-btn" onclick="downloadPDF()">Download PDF Report</button>
+  <div class="btn-group">
+    <button class="btn btn-copy" onclick="copyResults()">Copy to Clipboard</button>
+    <button class="btn btn-pdf" onclick="downloadPDF()">Download PDF</button>
+  </div>
 </div>
 
-<button class="copy-btn pdf-btn" onclick="downloadPDF()" style="margin-bottom:10px;">Download PDF Report</button>
-<button class="reset-btn" onclick="resetAll()">Reset All Checkboxes</button>
+<!-- Always visible PDF button -->
+<div style="margin-top:20px;">
+  <button class="btn btn-pdf" style="width:100%" onclick="downloadPDF()">Download PDF Report</button>
+</div>
 
+<button class="btn btn-reset" onclick="resetAll()">Reset All for Tomorrow</button>
+
+<div class="footer">CalendarJet QA System &middot; Updated daily</div>
+
+<!-- ============================== -->
+<!-- JAVASCRIPT -->
+<!-- ============================== -->
 <script>
-  // Date
   const now = new Date();
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  document.getElementById('dateBar').textContent = now.toLocaleDateString('en-US', options);
+  const dateOpts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const dateStr = now.toLocaleDateString('en-US', dateOpts);
+  document.getElementById('dateBar').textContent = dateStr;
+  const storageKey = 'cj-qa-' + now.toISOString().slice(0, 10);
+  const ALL_SECTIONS = ['sec-booking','sec-testbooking','sec-timezone','sec-gcal','sec-ai','sec-brand','sec-support'];
 
-  // Storage key based on date
-  const storageKey = 'qa-' + now.toISOString().slice(0, 10);
-
-  // Load saved state
   function loadState() {
     try {
-      const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
-      const checkboxes = document.querySelectorAll('.task input[type="checkbox"]');
-      checkboxes.forEach((cb, i) => {
-        if (saved.checks && saved.checks[i]) {
-          cb.checked = true;
-          cb.closest('.task').classList.add('checked');
-        }
+      const s = JSON.parse(localStorage.getItem(storageKey) || '{}');
+      const cbs = document.querySelectorAll('.task-check');
+      cbs.forEach((cb, i) => {
+        if (s.checks && s.checks[i]) { cb.checked = true; cb.closest('.task').classList.add('checked'); }
       });
-      if (saved.results) {
-        document.querySelectorAll('.pass-fail').forEach((pf, i) => {
-          if (saved.results[i]) {
-            const btn = pf.querySelector(`.btn-${saved.results[i]}`);
+      if (s.verdicts) {
+        document.querySelectorAll('.verdict').forEach((v, i) => {
+          if (s.verdicts[i]) {
+            const btn = v.querySelector('.v-' + s.verdicts[i]);
             if (btn) btn.classList.add('active');
           }
         });
@@ -693,250 +1045,277 @@
   }
 
   function saveState() {
-    const checks = [];
-    document.querySelectorAll('.task input[type="checkbox"]').forEach(cb => {
-      checks.push(cb.checked);
+    const checks = []; const verdicts = [];
+    document.querySelectorAll('.task-check').forEach(cb => checks.push(cb.checked));
+    document.querySelectorAll('.verdict').forEach(v => {
+      if (v.querySelector('.v-pass.active')) verdicts.push('pass');
+      else if (v.querySelector('.v-fail.active')) verdicts.push('fail');
+      else if (v.querySelector('.v-skip.active')) verdicts.push('skip');
+      else verdicts.push(null);
     });
-    const results = [];
-    document.querySelectorAll('.pass-fail').forEach(pf => {
-      if (pf.querySelector('.btn-pass.active')) results.push('pass');
-      else if (pf.querySelector('.btn-fail.active')) results.push('fail');
-      else if (pf.querySelector('.btn-skip.active')) results.push('skip');
-      else results.push(null);
-    });
-    localStorage.setItem(storageKey, JSON.stringify({ checks, results }));
+    localStorage.setItem(storageKey, JSON.stringify({ checks, verdicts }));
   }
 
   function updateProgress() {
-    const all = document.querySelectorAll('.task input[type="checkbox"]');
-    const checked = document.querySelectorAll('.task input[type="checkbox"]:checked');
+    const all = document.querySelectorAll('.task-check');
+    const checked = document.querySelectorAll('.task-check:checked');
     const pct = all.length ? Math.round((checked.length / all.length) * 100) : 0;
     document.getElementById('progressFill').style.width = pct + '%';
-    document.getElementById('progressText').textContent = `${checked.length} / ${all.length} done (${pct}%)`;
+    document.getElementById('progressPct').textContent = pct + '%';
 
-    // Update section badges
-    const sections = ['sec-booking', 'sec-testbooking', 'sec-timezone', 'sec-gcal', 'sec-ai', 'sec-brand', 'sec-support'];
-    sections.forEach(sec => {
-      const tasks = document.querySelectorAll(`#${sec} .task input[type="checkbox"]`);
-      const done = document.querySelectorAll(`#${sec} .task input[type="checkbox"]:checked`);
-      const badge = document.getElementById(`badge-${sec}`);
+    const passes = document.querySelectorAll('.v-pass.active').length;
+    const fails = document.querySelectorAll('.v-fail.active').length;
+    const skips = document.querySelectorAll('.v-skip.active').length;
+    document.getElementById('statPass').textContent = passes;
+    document.getElementById('statFail').textContent = fails;
+    document.getElementById('statSkip').textContent = skips;
+
+    ALL_SECTIONS.forEach(sec => {
+      const t = document.querySelectorAll('#' + sec + ' .task-check');
+      const d = document.querySelectorAll('#' + sec + ' .task-check:checked');
+      const badge = document.getElementById('badge-' + sec);
       if (badge) {
-        badge.textContent = `${done.length}/${tasks.length}`;
-        badge.classList.toggle('done', done.length === tasks.length && tasks.length > 0);
+        badge.textContent = d.length + '/' + t.length;
+        badge.classList.toggle('done', d.length === t.length && t.length > 0);
       }
     });
 
-    // Update checked visual
-    all.forEach(cb => {
-      cb.closest('.task').classList.toggle('checked', cb.checked);
-    });
-
+    all.forEach(cb => cb.closest('.task').classList.toggle('checked', cb.checked));
     saveState();
-    updateResultsBox();
+    updateResults();
   }
 
-  function setResult(btn, type) {
-    const pf = btn.closest('.pass-fail');
-    pf.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  function setVerdict(btn, type) {
+    const v = btn.closest('.verdict');
+    v.querySelectorAll('button').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    // Auto-check the checkbox
-    const task = btn.closest('.task');
-    const cb = task.querySelector('input[type="checkbox"]');
-    if (cb && !cb.checked) {
-      cb.checked = true;
-    }
+    const cb = btn.closest('.task').querySelector('.task-check');
+    if (cb && !cb.checked) cb.checked = true;
     updateProgress();
   }
 
-  function toggleSection(id) {
-    const body = document.querySelector(`#${id} .section-body`);
-    body.style.display = body.style.display === 'none' ? 'block' : 'block';
+  function toggle(id) {
+    document.getElementById(id).classList.toggle('collapsed');
   }
 
-  function updateResultsBox() {
-    const all = document.querySelectorAll('.task input[type="checkbox"]');
-    const checked = document.querySelectorAll('.task input[type="checkbox"]:checked');
-    if (checked.length === 0) {
-      document.getElementById('resultsBox').style.display = 'none';
-      return;
-    }
-    document.getElementById('resultsBox').style.display = 'block';
-    let html = '';
+  function getTaskResults() {
+    const results = [];
     document.querySelectorAll('.task').forEach(task => {
       const title = task.querySelector('.task-title')?.textContent || '';
-      const pf = task.querySelector('.pass-fail');
-      let status = 'Not tested';
-      if (pf) {
-        if (pf.querySelector('.btn-pass.active')) status = 'PASS';
-        else if (pf.querySelector('.btn-fail.active')) status = 'FAIL';
-        else if (pf.querySelector('.btn-skip.active')) status = 'SKIP';
+      const v = task.querySelector('.verdict');
+      let status = 'NOT TESTED';
+      if (v) {
+        if (v.querySelector('.v-pass.active')) status = 'PASS';
+        else if (v.querySelector('.v-fail.active')) status = 'FAIL';
+        else if (v.querySelector('.v-skip.active')) status = 'SKIP';
       }
-      const icon = status === 'PASS' ? '&#9989;' : status === 'FAIL' ? '&#10060;' : status === 'SKIP' ? '&#9898;' : '&#11035;';
-      html += `<div class="result-line">${icon} ${title} &mdash; ${status}</div>`;
+      results.push({ title, status });
+    });
+    return results;
+  }
+
+  function updateResults() {
+    const results = getTaskResults();
+    const tested = results.filter(r => r.status !== 'NOT TESTED');
+    const box = document.getElementById('resultsBox');
+    if (tested.length === 0) { box.style.display = 'none'; return; }
+    box.style.display = 'block';
+    let html = '';
+    results.forEach(r => {
+      const cls = r.status === 'PASS' ? 'rs-pass' : r.status === 'FAIL' ? 'rs-fail' : r.status === 'SKIP' ? 'rs-skip' : 'rs-none';
+      const icon = r.status === 'PASS' ? '&#9989;' : r.status === 'FAIL' ? '&#10060;' : r.status === 'SKIP' ? '&#9898;' : '&#11036;';
+      html += '<div class="result-row"><span class="result-icon">' + icon + '</span><span class="result-title">' + r.title + '</span><span class="result-status ' + cls + '">' + r.status + '</span></div>';
     });
     document.getElementById('resultsList').innerHTML = html;
   }
 
   function copyResults() {
-    const dateStr = now.toLocaleDateString('en-US', options);
-    let text = `CalendarJet QA Report - ${dateStr}\n${'='.repeat(40)}\n\n`;
-    document.querySelectorAll('.task').forEach(task => {
-      const title = task.querySelector('.task-title')?.textContent || '';
-      const pf = task.querySelector('.pass-fail');
-      let status = 'Not tested';
-      if (pf) {
-        if (pf.querySelector('.btn-pass.active')) status = 'PASS';
-        else if (pf.querySelector('.btn-fail.active')) status = 'FAIL';
-        else if (pf.querySelector('.btn-skip.active')) status = 'SKIP';
-      }
-      const icon = status === 'PASS' ? '+' : status === 'FAIL' ? 'X' : status === 'SKIP' ? '-' : '?';
-      text += `[${icon}] ${title} - ${status}\n`;
+    const results = getTaskResults();
+    const passes = results.filter(r => r.status === 'PASS').length;
+    const fails = results.filter(r => r.status === 'FAIL').length;
+    let text = 'CalendarJet QA Report - ' + dateStr + '\n' + '='.repeat(40) + '\n\n';
+    results.forEach(r => {
+      const icon = r.status === 'PASS' ? '+' : r.status === 'FAIL' ? 'X' : r.status === 'SKIP' ? '-' : '?';
+      text += '[' + icon + '] ' + r.title + ' - ' + r.status + '\n';
     });
-    const all = document.querySelectorAll('.task input[type="checkbox"]');
-    const checked = document.querySelectorAll('.task input[type="checkbox"]:checked');
-    const fails = document.querySelectorAll('.btn-fail.active').length;
-    text += `\nTotal: ${checked.length}/${all.length} tested | ${fails} failures\n`;
+    text += '\nTotal: ' + passes + ' passed, ' + fails + ' failed\n';
     navigator.clipboard.writeText(text).then(() => {
-      const btn = document.querySelector('.copy-btn');
+      const btn = document.querySelector('.btn-copy');
+      const orig = btn.textContent;
       btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = 'Copy Summary to Clipboard', 2000);
+      setTimeout(() => btn.textContent = orig, 2000);
     });
-  }
-
-  function resetAll() {
-    if (!confirm('Reset all checkboxes and results for today?')) return;
-    localStorage.removeItem(storageKey);
-    document.querySelectorAll('.task input[type="checkbox"]').forEach(cb => cb.checked = false);
-    document.querySelectorAll('.pass-fail button').forEach(b => b.classList.remove('active'));
-    updateProgress();
   }
 
   function downloadPDF() {
+    if (!window.jspdf) {
+      alert('PDF library is still loading. Please wait a moment and try again.');
+      return;
+    }
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    const dateStr = now.toLocaleDateString('en-US', options);
-    const all = document.querySelectorAll('.task input[type="checkbox"]');
-    const checked = document.querySelectorAll('.task input[type="checkbox"]:checked');
-    const passes = document.querySelectorAll('.btn-pass.active').length;
-    const fails = document.querySelectorAll('.btn-fail.active').length;
-    const skips = document.querySelectorAll('.btn-skip.active').length;
+    const results = getTaskResults();
+    const passes = results.filter(r => r.status === 'PASS').length;
+    const fails = results.filter(r => r.status === 'FAIL').length;
+    const skips = results.filter(r => r.status === 'SKIP').length;
+    const tested = results.filter(r => r.status !== 'NOT TESTED').length;
 
-    // Header
-    doc.setFillColor(102, 126, 234);
-    doc.rect(0, 0, 210, 40, 'F');
+    // === PAGE 1: Header ===
+    doc.setFillColor(108, 92, 231);
+    doc.rect(0, 0, 210, 45, 'F');
+    // Decorative circles
+    doc.setFillColor(162, 155, 254);
+    doc.circle(180, 10, 25, 'F');
+    doc.setFillColor(116, 185, 255);
+    doc.circle(30, 40, 15, 'F');
+
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(22);
+    doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
-    doc.text('CalendarJet QA Report', 105, 18, { align: 'center' });
+    doc.text('CalendarJet QA Report', 105, 20, { align: 'center' });
     doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
-    doc.text(dateStr, 105, 30, { align: 'center' });
+    doc.text(dateStr, 105, 32, { align: 'center' });
+    doc.setFontSize(10);
+    doc.text('Tester: Samreen', 105, 40, { align: 'center' });
 
-    // Summary box
-    let y = 50;
-    doc.setTextColor(50, 50, 50);
-    doc.setFontSize(14);
+    // === Summary boxes ===
+    let y = 55;
+    const boxW = 42;
+    const boxH = 22;
+    const startX = 14;
+    const gap = 4;
+
+    // Tested
+    doc.setFillColor(238, 240, 248);
+    doc.roundedRect(startX, y, boxW, boxH, 3, 3, 'F');
+    doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
-    doc.text('Summary', 14, y);
-    y += 8;
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Tested: ${checked.length} / ${all.length}`, 14, y);
-    y += 6;
+    doc.setTextColor(108, 92, 231);
+    doc.text(String(tested), startX + boxW/2, y + 10, { align: 'center' });
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text('TESTED', startX + boxW/2, y + 17, { align: 'center' });
 
-    doc.setTextColor(40, 167, 69);
-    doc.text(`Passed: ${passes}`, 14, y);
-    doc.setTextColor(220, 53, 69);
-    doc.text(`Failed: ${fails}`, 60, y);
-    doc.setTextColor(108, 117, 125);
-    doc.text(`Skipped: ${skips}`, 106, y);
+    // Passed
+    doc.setFillColor(230, 249, 240);
+    doc.roundedRect(startX + (boxW + gap), y, boxW, boxH, 3, 3, 'F');
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 133, 106);
+    doc.text(String(passes), startX + (boxW + gap) + boxW/2, y + 10, { align: 'center' });
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text('PASSED', startX + (boxW + gap) + boxW/2, y + 17, { align: 'center' });
+
+    // Failed
+    doc.setFillColor(253, 232, 228);
+    doc.roundedRect(startX + 2*(boxW + gap), y, boxW, boxH, 3, 3, 'F');
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(196, 64, 37);
+    doc.text(String(fails), startX + 2*(boxW + gap) + boxW/2, y + 10, { align: 'center' });
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text('FAILED', startX + 2*(boxW + gap) + boxW/2, y + 17, { align: 'center' });
+
+    // Skipped
+    doc.setFillColor(240, 240, 245);
+    doc.roundedRect(startX + 3*(boxW + gap), y, boxW, boxH, 3, 3, 'F');
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(99, 110, 114);
+    doc.text(String(skips), startX + 3*(boxW + gap) + boxW/2, y + 10, { align: 'center' });
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text('SKIPPED', startX + 3*(boxW + gap) + boxW/2, y + 17, { align: 'center' });
+
+    y += boxH + 15;
+
+    // === Detailed Results ===
+    doc.setDrawColor(220, 220, 230);
+    doc.line(14, y, 196, y);
     y += 10;
 
-    // Divider
-    doc.setDrawColor(200, 200, 200);
-    doc.line(14, y, 196, y);
-    y += 8;
+    const sections = [
+      { name: 'Compare Booking Pages', color: [108,92,231], tasks: results.slice(0, 4) },
+      { name: 'Test Booking Submission', color: [0,184,148], tasks: results.slice(4, 6) },
+      { name: 'Timezone Matching', color: [9,132,227], tasks: results.slice(6, 9) },
+      { name: 'Google Calendar Sync', color: [253,203,110], tasks: results.slice(9, 11) },
+      { name: 'AI Agent', color: [225,112,85], tasks: results.slice(11, 12) },
+      { name: 'Branding & Customizer', color: [162,155,254], tasks: results.slice(12, 14) },
+      { name: 'Support Ticket', color: [99,110,114], tasks: results.slice(14, 15) },
+    ];
 
-    // Section results
-    const sectionNames = {
-      'sec-booking': 'Compare Booking Pages',
-      'sec-testbooking': 'Test Booking Submission',
-      'sec-timezone': 'Timezone Matching',
-      'sec-gcal': 'Google Calendar Sync',
-      'sec-ai': 'AI Agent',
-      'sec-brand': 'Branding & Customizer',
-      'sec-support': 'Support Ticket'
-    };
-    const sectionIds = Object.keys(sectionNames);
-
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(50, 50, 50);
-    doc.text('Detailed Results', 14, y);
-    y += 8;
-
-    sectionIds.forEach(secId => {
-      const tasks = document.querySelectorAll(`#${secId} .task`);
-      if (tasks.length === 0) return;
-
-      // Check if we need a new page
+    sections.forEach(sec => {
       if (y > 260) { doc.addPage(); y = 20; }
 
-      doc.setFontSize(11);
+      // Section header with colored bar
+      doc.setFillColor(...sec.color);
+      doc.roundedRect(14, y - 4, 3, 14, 1, 1, 'F');
+      doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(102, 126, 234);
-      doc.text(sectionNames[secId], 14, y);
-      y += 6;
+      doc.setTextColor(50, 50, 50);
+      doc.text(sec.name, 22, y + 5);
+      y += 14;
 
-      tasks.forEach(task => {
+      sec.tasks.forEach(t => {
         if (y > 275) { doc.addPage(); y = 20; }
 
-        const title = task.querySelector('.task-title')?.textContent || '';
-        const pf = task.querySelector('.pass-fail');
-        let status = 'NOT TESTED';
-        let color = [150, 150, 150];
-        if (pf) {
-          if (pf.querySelector('.btn-pass.active')) { status = 'PASS'; color = [40, 167, 69]; }
-          else if (pf.querySelector('.btn-fail.active')) { status = 'FAIL'; color = [220, 53, 69]; }
-          else if (pf.querySelector('.btn-skip.active')) { status = 'SKIP'; color = [108, 117, 125]; }
-        }
-
         // Status badge
-        doc.setFillColor(...color);
-        doc.roundedRect(14, y - 4, 18, 6, 1, 1, 'F');
-        doc.setTextColor(255, 255, 255);
+        let badgeColor, textColor;
+        if (t.status === 'PASS') { badgeColor = [230,249,240]; textColor = [0,133,106]; }
+        else if (t.status === 'FAIL') { badgeColor = [253,232,228]; textColor = [196,64,37]; }
+        else if (t.status === 'SKIP') { badgeColor = [240,240,245]; textColor = [99,110,114]; }
+        else { badgeColor = [240,240,245]; textColor = [170,170,170]; }
+
+        doc.setFillColor(...badgeColor);
+        doc.roundedRect(22, y - 4, 22, 7, 2, 2, 'F');
         doc.setFontSize(7);
         doc.setFont('helvetica', 'bold');
-        doc.text(status, 23, y, { align: 'center' });
+        doc.setTextColor(...textColor);
+        doc.text(t.status, 33, y + 1, { align: 'center' });
 
-        // Task title
-        doc.setTextColor(50, 50, 50);
-        doc.setFontSize(10);
+        doc.setTextColor(60, 60, 60);
+        doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.text(title, 36, y);
-        y += 7;
+        const titleLines = doc.splitTextToSize(t.title, 140);
+        doc.text(titleLines, 48, y + 1);
+        y += Math.max(8, titleLines.length * 5 + 3);
       });
-      y += 3;
+      y += 4;
     });
 
     // Footer
-    if (y > 270) { doc.addPage(); y = 20; }
-    y += 5;
-    doc.setDrawColor(200, 200, 200);
+    if (y > 265) { doc.addPage(); y = 20; }
+    y += 6;
+    doc.setDrawColor(220, 220, 230);
     doc.line(14, y, 196, y);
-    y += 8;
-    doc.setFontSize(9);
-    doc.setTextColor(150, 150, 150);
-    doc.text('Generated from CalendarJet QA Checklist', 105, y, { align: 'center' });
-    y += 5;
-    doc.text(`Tester: Samreen | ${dateStr}`, 105, y, { align: 'center' });
+    y += 10;
+    doc.setFontSize(8);
+    doc.setTextColor(170, 170, 170);
+    doc.text('Generated from CalendarJet QA Checklist - aamirmursleen.github.io/calendarjet-qa', 105, y, { align: 'center' });
 
-    // Download
-    const fileName = `CalendarJet-QA-${now.toISOString().slice(0,10)}.pdf`;
-    doc.save(fileName);
+    doc.save('CalendarJet-QA-' + now.toISOString().slice(0, 10) + '.pdf');
+
+    // Button feedback
+    const btn = document.querySelector('.btn-pdf');
+    if (btn) {
+      const orig = btn.textContent;
+      btn.textContent = 'Downloaded!';
+      setTimeout(() => btn.textContent = orig, 2000);
+    }
   }
 
-  // Init
+  function resetAll() {
+    if (!confirm('Reset everything for a fresh start tomorrow?')) return;
+    localStorage.removeItem(storageKey);
+    document.querySelectorAll('.task-check').forEach(cb => { cb.checked = false; });
+    document.querySelectorAll('.verdict button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.task').forEach(t => t.classList.remove('checked'));
+    updateProgress();
+  }
+
   loadState();
 </script>
 </body>
