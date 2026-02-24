@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test: Per-Event Google Calendar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6C5CE7;
+      --primary-light: #a29bfe;
+      --success: #00b894;
+      --danger: #e17055;
+      --warning: #fdcb6e;
+      --skip: #b2bec3;
+      --bg: #f8f9fe;
+      --card: #ffffff;
+      --text: #2d3436;
+      --text-light: #636e72;
+      --border: #eef0f8;
+      --shadow: 0 4px 20px rgba(108, 92, 231, 0.08);
+      --radius: 16px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 20px 16px 40px;
+      max-width: 760px;
+      margin: 0 auto;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #6C5CE7 0%, #a29bfe 50%, #74b9ff 100%);
+      border-radius: 24px;
+      padding: 32px 24px 28px;
+      text-align: center;
+      color: white;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 160px; height: 160px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    .hero h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 6px; position: relative; }
+    .hero .tagline { font-size: 0.95rem; opacity: 0.9; font-weight: 500; margin-bottom: 12px; position: relative; }
+    .hero .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      position: relative;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 16px;
+    }
+
+    .step {
+      background: #f8f9fe;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 10px;
+      border-left: 4px solid var(--primary-light);
+    }
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 0.8rem;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+    .step-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .step-detail {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-left: 38px;
+      line-height: 1.5;
+    }
+    .step-detail code {
+      background: #e8e6ff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .result-buttons {
+      display: flex;
+      gap: 8px;
+      margin-left: 38px;
+      margin-top: 10px;
+    }
+    .result-btn {
+      border: none;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      opacity: 0.5;
+    }
+    .result-btn:hover { opacity: 0.8; transform: translateY(-1px); }
+    .result-btn.active { opacity: 1; transform: scale(1.05); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .btn-pass { background: #dff9f0; color: #00b894; }
+    .btn-fail { background: #ffeaea; color: #e17055; }
+    .btn-skip { background: #eee; color: #636e72; }
+
+    .warning-box {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+    .warning-box strong { color: #f57f17; }
+
+    .info-box {
+      background: #e8f4fd;
+      border: 1px solid #90caf9;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+    .info-box strong { color: #1565c0; }
+
+    .success-box {
+      background: #e8f5e9;
+      border: 1px solid #a5d6a7;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+    .success-box strong { color: #2e7d32; }
+
+    .progress-bar-container {
+      background: #eee;
+      border-radius: 20px;
+      height: 10px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      border-radius: 20px;
+      transition: width 0.4s ease;
+    }
+    .progress-text {
+      font-size: 0.82rem;
+      color: var(--text-light);
+      text-align: right;
+      font-weight: 500;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+    .back-link:hover { opacity: 0.8; }
+
+    @media (max-width: 500px) {
+      .hero h1 { font-size: 1.3rem; }
+      .step-detail { margin-left: 0; margin-top: 8px; }
+      .result-buttons { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="back-link">&#8592; Back to Daily Checklist</a>
+
+  <div class="hero">
+    <h1>Per-Event Google Calendar</h1>
+    <div class="tagline">Test: Each event type goes to its own Google Calendar</div>
+    <div class="badge">Feature Test &bull; Feb 2026</div>
+  </div>
+
+  <!-- Progress -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <strong style="font-size:0.9rem;">Testing Progress</strong>
+      <span class="progress-text" id="progressText">0 / 9</span>
+    </div>
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <!-- WHAT THIS FEATURE DOES -->
+  <div class="card">
+    <h2>What Changed?</h2>
+    <div class="subtitle">Simple explanation of the feature</div>
+
+    <div class="info-box">
+      <strong>Before:</strong> ALL bookings went to the user's primary Google Calendar. Stavros couldn't separate gym classes from personal training.<br><br>
+      <strong>After:</strong> Each event type can target a SPECIFIC Google Calendar. Gym Classes go to "Gym" calendar. Personal Training goes to "PT" calendar. If no calendar is selected, it works exactly like before (primary calendar).
+    </div>
+  </div>
+
+  <!-- PREREQUISITES -->
+  <div class="card">
+    <h2>Before You Start</h2>
+    <div class="subtitle">Make sure these are ready</div>
+
+    <div class="warning-box">
+      <strong>You need:</strong><br>
+      1. A Google account connected in CalendarJet with at least 2 calendars visible<br>
+      2. At least 2 event types created<br>
+      3. Test on <code>new.calendarjet.com</code> (staging) only<br>
+      4. Have Google Calendar open in another tab to verify events appear
+    </div>
+  </div>
+
+  <!-- TEST 1: SET UP CALENDARS -->
+  <div class="card" id="section-setup">
+    <h2>Section 1: Setup</h2>
+    <div class="subtitle">Configure per-event-type calendars</div>
+
+    <div class="step" data-test="1">
+      <div class="step-header">
+        <span class="step-number">1</span>
+        Go to Event Type Settings
+      </div>
+      <div class="step-detail">
+        Log in to <code>new.calendarjet.com</code> &rarr; Click on an event type (e.g., "Gym Classes") &rarr; Click "Edit"<br>
+        <strong>Look for:</strong> A "Google Calendar" or "Calendar" dropdown/selector in the settings
+      </div>
+      <div class="result-buttons">
+        <button class="result-btn btn-pass" onclick="setResult(1, 'pass')">Pass</button>
+        <button class="result-btn btn-fail" onclick="setResult(1, 'fail')">Fail</button>
+        <button class="result-btn btn-skip" onclick="setResult(1, 'skip')">Skip</button>
+      </div>
+    </div>
+
+    <div class="step" data-test="2">
+      <div class="step-header">
+        <span class="step-number">2</span>
+        Select a Specific Calendar
+      </div>
+      <div class="step-detail">
+        In the calendar dropdown, switch from "All Calendars" to "Specific Calendars"<br>
+        Select a calendar (e.g., "Gym Classes" calendar) &rarr; Save the event type<br>
+        <strong>Expected:</strong> The setting saves without errors
+      </div>
+      <div class="result-buttons">
+        <button class="result-btn btn-pass" onclick="setResult(2, 'pass')">Pass</button>
+        <button class="result-btn btn-fail" onclick="setResult(2, 'fail')">Fail</button>
+        <button class="result-btn btn-skip" onclick="setResult(2, 'skip')">Skip</button>
+      </div>
+    </div>
+
+    <div class="step" data-test="3">
+      <div class="step-header">
+        <span class="step-number">3</span>
+        Set Up a Second Event Type
+      </div>
+      <div class="step-detail">
+        Edit a different event type (e.g., "Personal Training")<br>
+        Select a DIFFERENT Google Calendar (e.g., "Personal Training" calendar) &rarr; Save<br>
+        <strong>Now you have:</strong> Event A &rarr; Calendar A, Event B &rarr; Calendar B
+      </div>
+      <div class="result-buttons">
+        <button class="result-btn btn-pass" onclick="setResult(3, 'pass')">Pass</button>
+        <button class="result-btn btn-fail" onclick="setResult(3, 'fail')">Fail</button>
+        <button class="result-btn btn-skip" onclick="setResult(3, 'skip')">Skip</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEST 2: BOOKING CREATION -->
+  <div class="card" id="section-booking">
+    <h2>Section 2: Book & Verify</h2>
+    <div class="subtitle">Create bookings and check which calendar they land in</div>
+
+    <div class="step" data-test="4">
+      <div class="step-header">
+        <span class="step-number">4</span>
+        Book Event Type A (e.g., Gym Classes)
+      </div>
+      <div class="step-detail">
+        Open the booking page for Event A (use incognito or another browser)<br>
+        Pick a date &rarr; Pick a time &rarr; Fill in name + email &rarr; Book it<br>
+        <strong>Then check:</strong> Open Google Calendar. Does the event appear in the "Gym Classes" calendar (not primary)?
+      </div>
+      <div class="result-buttons">
+        <button class="result-btn btn-pass" onclick="setResult(4, 'pass')">Pass</button>
+        <button class="result-btn btn-fail" onclick="setResult(4, 'fail')">Fail</button>
+        <button class="result-btn btn-skip" onclick="setResult(4, 'skip')">Skip</button>
+      </div>
+    </div>
+
+    <div class="step" data-test="5">
+      <div class="step-header">
+        <span class="step-number">5</span>
+        Book Event Type B (e.g., Personal Training)
+      </div>
+      <div class="step-detail">
+        Open the booking page for Event B<br>
+        Pick a date &rarr; Pick a time &rarr; Fill in name + email &rarr; Book it<br>
+        <strong>Then check:</strong> Does the event appear in the "Personal Training" calendar (not primary, not Gym)?
+      </div>
+      <div class="result-buttons">
+        <button class="result-btn btn-pass" onclick="setResult(5, 'pass')">Pass</button>
+        <button class="result-btn btn-fail" onclick="setResult(5, 'fail')">Fail</button>
+        <button class="result-btn btn-skip" onclick="setResult(5, 'skip')">Skip</button>
+      </div>
+    </div>
+
+    <div class="step" data-test="6">
+      <div class="step-header">
+        <span class="step-number">6</span>
+        Book Event Type C (no calendar selected = default)
+      </div>
+      <div class="step-detail">
+        If you have a third event type with NO specific calendar set (default)<br>
+        Book it and check: Does it go to the PRIMARY calendar? (same as before the feature)
+      </div>
+      <div class="result-buttons">
+        <button class="result-btn btn-pass" onclick="setResult(6, 'pass')">Pass</button>
+        <button class="result-btn btn-fail" onclick="setResult(6, 'fail')">Fail</button>
+        <button class="result-btn btn-skip" onclick="setResult(6, 'skip')">Skip</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEST 3: CANCELLATION -->
+  <div class="card" id="section-cancel">
+    <h2>Section 3: Cancel & Reschedule</h2>
+    <div class="subtitle">Make sure events get deleted from the RIGHT calendar</div>
+
+    <div class="step" data-test="7">
+      <div class="step-header">
+        <span class="step-number">7</span>
+        Cancel a Booking (Event Type A)
+      </div>
+      <div class="step-detail">
+        Go to your bookings list &rarr; Find the Gym Classes booking &rarr; Cancel it<br>
+        <strong>Then check Google Calendar:</strong> Is the event REMOVED from the "Gym Classes" calendar?<br>
+        <strong>Important:</strong> It should NOT leave an orphaned event behind
+      </div>
+      <div class="result-buttons">
+        <button class="result-btn btn-pass" onclick="setResult(7, 'pass')">Pass</button>
+        <button class="result-btn btn-fail" onclick="setResult(7, 'fail')">Fail</button>
+        <button class="result-btn btn-skip" onclick="setResult(7, 'skip')">Skip</button>
+      </div>
+    </div>
+
+    <div class="step" data-test="8">
+      <div class="step-header">
+        <span class="step-number">8</span>
+        Reschedule a Booking (Event Type B)
+      </div>
+      <div class="step-detail">
+        Find the Personal Training booking &rarr; Reschedule to a new date/time<br>
+        <strong>Then check Google Calendar:</strong> Does the event in "Personal Training" calendar show the NEW time?<br>
+        <strong>Note:</strong> Before this fix, reschedule didn't update Google Calendar at all!
+      </div>
+      <div class="result-buttons">
+        <button class="result-btn btn-pass" onclick="setResult(8, 'pass')">Pass</button>
+        <button class="result-btn btn-fail" onclick="setResult(8, 'fail')">Fail</button>
+        <button class="result-btn btn-skip" onclick="setResult(8, 'skip')">Skip</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEST 4: BACKWARD COMPATIBILITY -->
+  <div class="card" id="section-backward">
+    <h2>Section 4: Backward Compatibility</h2>
+    <div class="subtitle">Make sure nothing broke for existing customers</div>
+
+    <div class="step" data-test="9">
+      <div class="step-header">
+        <span class="step-number">9</span>
+        Existing Event Types Still Work
+      </div>
+      <div class="step-detail">
+        Book an event type that was NEVER edited (no calendar selection)<br>
+        <strong>Check:</strong> Does it still go to the primary calendar like before?<br>
+        <strong>This is the most important test!</strong> If this fails, existing customers are affected
+      </div>
+      <div class="result-buttons">
+        <button class="result-btn btn-pass" onclick="setResult(9, 'pass')">Pass</button>
+        <button class="result-btn btn-fail" onclick="setResult(9, 'fail')">Fail</button>
+        <button class="result-btn btn-skip" onclick="setResult(9, 'skip')">Skip</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="card" id="summary" style="display:none;">
+    <h2>Test Summary</h2>
+    <div id="summaryContent"></div>
+  </div>
+
+  <div class="success-box" style="text-align:center; margin-top:20px;">
+    <strong>When done:</strong> Screenshot this page and share in the team chat!<br>
+    If any test FAILS, message the team right away with what happened.
+  </div>
+
+  <script>
+    const results = {};
+    const totalTests = 9;
+
+    function setResult(testNum, result) {
+      results[testNum] = result;
+
+      // Update button styles
+      const step = document.querySelector(`[data-test="${testNum}"]`);
+      step.querySelectorAll('.result-btn').forEach(btn => btn.classList.remove('active'));
+      step.querySelector(`.btn-${result}`).classList.add('active');
+
+      // Update step border color
+      if (result === 'pass') step.style.borderLeftColor = '#00b894';
+      else if (result === 'fail') step.style.borderLeftColor = '#e17055';
+      else step.style.borderLeftColor = '#b2bec3';
+
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const completed = Object.keys(results).length;
+      const pct = Math.round((completed / totalTests) * 100);
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressText').textContent = `${completed} / ${totalTests}`;
+
+      // Show summary when all done
+      if (completed === totalTests) {
+        const passes = Object.values(results).filter(r => r === 'pass').length;
+        const fails = Object.values(results).filter(r => r === 'fail').length;
+        const skips = Object.values(results).filter(r => r === 'skip').length;
+
+        const summary = document.getElementById('summary');
+        summary.style.display = 'block';
+        document.getElementById('summaryContent').innerHTML = `
+          <div style="display:flex; gap:16px; justify-content:center; margin-top:12px;">
+            <div style="text-align:center; padding:12px 20px; background:#dff9f0; border-radius:12px;">
+              <div style="font-size:1.5rem; font-weight:800; color:#00b894;">${passes}</div>
+              <div style="font-size:0.8rem; color:#00b894; font-weight:600;">Passed</div>
+            </div>
+            <div style="text-align:center; padding:12px 20px; background:#ffeaea; border-radius:12px;">
+              <div style="font-size:1.5rem; font-weight:800; color:#e17055;">${fails}</div>
+              <div style="font-size:0.8rem; color:#e17055; font-weight:600;">Failed</div>
+            </div>
+            <div style="text-align:center; padding:12px 20px; background:#eee; border-radius:12px;">
+              <div style="font-size:1.5rem; font-weight:800; color:#636e72;">${skips}</div>
+              <div style="font-size:0.8rem; color:#636e72; font-weight:600;">Skipped</div>
+            </div>
+          </div>
+          <div style="text-align:center; margin-top:16px; font-size:0.9rem; color:var(--text-light);">
+            ${fails === 0 ? 'All tests passed! Feature is ready.' : 'Some tests failed. Please report to the team.'}
+          </div>
+        `;
+        summary.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  </script>
+
+</body>
+</html>
